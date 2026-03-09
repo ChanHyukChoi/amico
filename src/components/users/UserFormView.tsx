@@ -6,9 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { fetchUser, createUser, updateUser } from "@/api/users";
 import type { CreateUserRequest, UpdateUserRequest } from "@/types/user";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button, TextField, Box, Stack } from "@mui/material";
 
 const createUserFormSchema = z
   .object({
@@ -124,6 +122,11 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
         : undefined,
   });
 
+  const registerTextField = (name: keyof UserFormValues) => {
+    const { ref, ...rest } = register(name);
+    return { ...rest, inputRef: ref };
+  };
+
   const onSubmit = async (values: UserFormValues) => {
     const name = values.name.trim();
     const dept = values.department?.trim();
@@ -156,136 +159,110 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
   }
   if (mode === "edit" && !user) {
     return (
-      <div>
-        <p className="text-destructive">{t("users.notFound")}</p>
+      <Box>
+        <p style={{ color: "var(--destructive, #dc2626)" }}>{t("users.notFound")}</p>
         <Button
-          variant="link"
-          className="mt-2 p-0 h-auto"
+          variant="text"
+          sx={{ mt: 2, p: 0, minHeight: "auto" }}
           onClick={() => navigate("/users")}
         >
           {t("users.backToList")}
         </Button>
-      </div>
+      </Box>
     );
   }
 
   return (
-    <div className="max-w-md space-y-4">
-      <h1 className="text-2xl font-semibold">
-        {mode === "create" ? t("users.addUser") : t("users.editUser")}
-      </h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="userId">{t("users.userId")} *</Label>
-          <Input
-            id="userId"
-            {...register("userId")}
-            aria-invalid={!!errors.userId}
-            readOnly={mode === "edit"}
-            className={mode === "edit" ? "bg-muted" : undefined}
-          />
-          {errors.userId && (
-            <p className="text-sm text-destructive">{t("users.required")}</p>
-          )}
-        </div>
+    <Box sx={{ maxWidth: 448 }}>
+      <Stack component="form" onSubmit={handleSubmit(onSubmit)} spacing={2}>
+        <h1 style={{ fontSize: "1.5rem", fontWeight: 600 }}>
+          {mode === "create" ? t("users.addUser") : t("users.editUser")}
+        </h1>
+
+        <TextField
+          label={`${t("users.userId")} *`}
+          {...registerTextField("userId")}
+          error={!!errors.userId}
+          helperText={errors.userId ? t("users.required") : undefined}
+          InputProps={{ readOnly: mode === "edit" }}
+          fullWidth
+        />
+
         {mode === "create" && (
           <>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("users.password")} *</Label>
-              <Input
-                id="password"
-                type="password"
-                {...register("password")}
-                aria-invalid={!!errors.password}
-              />
-              {errors.password && (
-                <p className="text-sm text-destructive">{t("users.required")}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="passwordConfirm">
-                {t("users.passwordConfirm")} *
-              </Label>
-              <Input
-                id="passwordConfirm"
-                type="password"
-                {...register("passwordConfirm")}
-                aria-invalid={!!errors.passwordConfirm}
-              />
-              {errors.passwordConfirm && (
-                <p className="text-sm text-destructive">
-                  {t("users.passwordMismatch")}
-                </p>
-              )}
-            </div>
+            <TextField
+              label={`${t("users.password")} *`}
+              type="password"
+              {...registerTextField("password")}
+              error={!!errors.password}
+              helperText={errors.password ? t("users.required") : undefined}
+              fullWidth
+            />
+            <TextField
+              label={`${t("users.passwordConfirm")} *`}
+              type="password"
+              {...registerTextField("passwordConfirm")}
+              error={!!errors.passwordConfirm}
+              helperText={errors.passwordConfirm ? t("users.passwordMismatch") : undefined}
+              fullWidth
+            />
           </>
         )}
+
         {mode === "edit" && (
           <>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("users.password")}</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder={t("users.passwordChangeOptional")}
-                {...register("password")}
-                aria-invalid={!!errors.password}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="passwordConfirm">
-                {t("users.passwordConfirm")}
-              </Label>
-              <Input
-                id="passwordConfirm"
-                type="password"
-                placeholder={t("users.passwordChangeOptional")}
-                {...register("passwordConfirm")}
-                aria-invalid={!!errors.passwordConfirm}
-              />
-              {errors.passwordConfirm && (
-                <p className="text-sm text-destructive">
-                  {t("users.passwordMismatch")}
-                </p>
-              )}
-            </div>
+            <TextField
+              label={t("users.password")}
+              type="password"
+              placeholder={t("users.passwordChangeOptional")}
+              {...registerTextField("password")}
+              fullWidth
+            />
+            <TextField
+              label={t("users.passwordConfirm")}
+              type="password"
+              placeholder={t("users.passwordChangeOptional")}
+              {...registerTextField("passwordConfirm")}
+              error={!!errors.passwordConfirm}
+              helperText={errors.passwordConfirm ? t("users.passwordMismatch") : undefined}
+              fullWidth
+            />
           </>
         )}
-        <div className="space-y-2">
-          <Label htmlFor="name">{t("users.name")} *</Label>
-          <Input
-            id="name"
-            {...register("name")}
-            aria-invalid={!!errors.name}
-          />
-          {errors.name && (
-            <p className="text-sm text-destructive">{t("users.required")}</p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="department">{t("users.department")}</Label>
-          <Input id="department" {...register("department")} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">{t("users.email")}</Label>
-          <Input
-            id="email"
-            type="email"
-            {...register("email")}
-            aria-invalid={!!errors.email}
-          />
-          {errors.email && (
-            <p className="text-sm text-destructive">
-              {t("users.invalidEmail")}
-            </p>
-          )}
-        </div>
+
+        <TextField
+          label={`${t("users.name")} *`}
+          {...registerTextField("name")}
+          error={!!errors.name}
+          helperText={errors.name ? t("users.required") : undefined}
+          fullWidth
+        />
+
+        <TextField
+          label={t("users.department")}
+          {...registerTextField("department")}
+          fullWidth
+        />
+
+        <TextField
+          label={t("users.email")}
+          type="email"
+          {...registerTextField("email")}
+          error={!!errors.email}
+          helperText={errors.email ? t("users.invalidEmail") : undefined}
+          fullWidth
+        />
+
         {errors.root && (
-          <p className="text-sm text-destructive">{errors.root.message}</p>
+          <p style={{ color: "var(--destructive, #dc2626)", fontSize: "0.875rem" }}>
+            {errors.root.message}
+          </p>
         )}
-        <div className="flex gap-2">
+
+        <Stack direction="row" spacing={2}>
           <Button
             type="submit"
+            variant="contained"
             disabled={
               isSubmitting ||
               createMutation.isPending ||
@@ -300,13 +277,13 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
           </Button>
           <Button
             type="button"
-            variant="outline"
+            variant="outlined"
             onClick={() => navigate("/users")}
           >
             {t("common.cancel")}
           </Button>
-        </div>
-      </form>
-    </div>
+        </Stack>
+      </Stack>
+    </Box>
   );
 }
