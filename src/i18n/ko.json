@@ -24,6 +24,9 @@
     "list": "사용자 목록",
     "addUser": "사용자 추가",
     "editUser": "사용자 수정",
+    "userId": "로그인 ID",
+    "password": "비밀번호",
+    "passwordConfirm": "비밀번호 확인",
     "name": "이름",
     "department": "부서",
     "email": "이메일",
@@ -37,14 +40,17 @@
     "deleteSuccess": "사용자가 삭제되었습니다.",
     "deleteConfirm": "이 사용자를 삭제하시겠습니까?",
     "required": "필수 입력입니다.",
-    "invalidEmail": "올바른 이메일 형식이 아닙니다."
+    "invalidEmail": "올바른 이메일 형식이 아닙니다.",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다.",
+    "passwordChangeOptional": "변경 시에만 입력",
+    "userIdExists": "이미 사용 중인 로그인 ID입니다."
   },
   "layout": {
     "logout": "로그아웃",
     "nav": {
       "dashboard": "대시보드",
       "users": "사용자",
-      "accessLog": "출입 로그",
+      "accessLog": "출입 기록",
       "departments": "부서",
       "settings": "설정",
       "settingsAccess": "출입 설정",

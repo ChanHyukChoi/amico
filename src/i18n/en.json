@@ -24,6 +24,9 @@
     "list": "User List",
     "addUser": "Add User",
     "editUser": "Edit User",
+    "userId": "Login ID",
+    "password": "Password",
+    "passwordConfirm": "Confirm Password",
     "name": "Name",
     "department": "Department",
     "email": "Email",
@@ -37,7 +40,10 @@
     "deleteSuccess": "User has been deleted.",
     "deleteConfirm": "Are you sure you want to delete this user?",
     "required": "This field is required.",
-    "invalidEmail": "Invalid email format."
+    "invalidEmail": "Invalid email format.",
+    "passwordMismatch": "Passwords do not match.",
+    "passwordChangeOptional": "Leave blank to keep current",
+    "userIdExists": "This login ID is already in use."
   },
   "layout": {
     "logout": "Log out",

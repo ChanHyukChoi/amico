@@ -1,73 +1,42 @@
-# React + TypeScript + Vite
+# HID Amico 웹
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+HID Amico 생체인식 리더기(얼굴인식/카드/QR/PIN) 관리 웹 애플리케이션입니다.
 
-Currently, two official plugins are available:
+## 기술 스택
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| 구분 | 기술 |
+|------|------|
+| 런타임 | React 19, TypeScript 5.9 |
+| 빌드 | Vite 7 |
+| 스타일 | Tailwind CSS 4, MUI (Material UI) 7 |
+| 데이터 그리드 | MUI X Data Grid |
+| 폼 | React Hook Form, Zod |
+| 서버 상태 | TanStack Query |
+| 전역 상태 | Zustand |
+| 다국어 | i18next |
+| 목업 | MSW |
 
-## React Compiler
+## 시작하기
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+개발 시 MSW 목업이 활성화됩니다. 로그인: `1` / `1`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 스크립트
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `npm run dev` — 개발 서버
+- `npm run build` — 프로덕션 빌드
+- `npm run preview` — 빌드 결과 미리보기
+- `npm run lint` — ESLint 실행
+
+## 프로젝트 구조
+
+- `src/api` — API 클라이언트
+- `src/components` — 공통 컴포넌트, 사용자 UI
+- `src/pages` — 페이지 컴포넌트
+- `src/store` — Zustand 스토어
+- `src/mocks` — MSW 핸들러
+- `docs/PROJECT_STRUCTURE.md` — 상세 구조 문서

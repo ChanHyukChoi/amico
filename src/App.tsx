@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { ProtectedRoute } from '@/components/common/ProtectedRoute'
 import { Layout } from '@/components/common/Layout'
 import { LoginPage } from '@/pages/LoginPage'
@@ -13,8 +14,13 @@ import { SettingsSystemPage } from '@/pages/settings/SettingsSystemPage'
 
 const queryClient = new QueryClient()
 
+const muiTheme = createTheme({
+  palette: { mode: 'light' },
+})
+
 function App() {
   return (
+    <ThemeProvider theme={muiTheme}>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
@@ -41,6 +47,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
+    </ThemeProvider>
   )
 }
 

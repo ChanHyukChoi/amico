@@ -1,6 +1,8 @@
 /** 사용자 엔티티 */
 export interface User {
   id: string;
+  /** 로그인 ID */
+  userId: string;
   name: string;
   department?: string;
   email?: string;
@@ -16,6 +18,8 @@ export interface UserListParams {
 
 /** 사용자 생성 요청 */
 export interface CreateUserRequest {
+  userId: string;
+  password: string;
   name: string;
   department?: string;
   email?: string;
@@ -23,6 +27,8 @@ export interface CreateUserRequest {
 
 /** 사용자 수정 요청 */
 export interface UpdateUserRequest {
+  userId?: string;
+  password?: string;
   name?: string;
   department?: string;
   email?: string;

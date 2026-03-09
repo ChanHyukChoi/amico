@@ -7,10 +7,18 @@ export const MOCK_LOGIN = {
   password: "1",
 } as const;
 
+/** userId → 비밀번호 (개발용 목업) */
+const mockPasswords: Record<string, string> = {
+  "1": "1",
+  "2": "kim123",
+  "3": "lee123",
+};
+
 /** 사용자 목업 저장소 */
 const mockUsers: User[] = [
   {
     id: "1",
+    userId: "1",
     name: "홍길동",
     department: "개발팀",
     email: "hong@example.com",
@@ -18,6 +26,7 @@ const mockUsers: User[] = [
   },
   {
     id: "2",
+    userId: "2",
     name: "김철수",
     department: "인사팀",
     email: "kim@example.com",
@@ -25,6 +34,7 @@ const mockUsers: User[] = [
   },
   {
     id: "3",
+    userId: "3",
     name: "이영희",
     department: "기획팀",
     email: "lee@example.com",
@@ -40,9 +50,8 @@ export const handlers = [
       username?: string;
       password?: string;
     };
-    const ok =
-      body.username === MOCK_LOGIN.username &&
-      body.password === MOCK_LOGIN.password;
+    const storedPw = mockPasswords[body.username ?? ""];
+    const ok = storedPw != null && storedPw === body.password;
     if (ok) {
       return HttpResponse.json({
         success: true,
@@ -73,6 +82,7 @@ export const handlers = [
       filtered = mockUsers.filter(
         (u) =>
           u.name.toLowerCase().includes(search) ||
+          u.userId.toLowerCase().includes(search) ||
           (u.department?.toLowerCase().includes(search) ?? false) ||
           (u.email?.toLowerCase().includes(search) ?? false),
       );
@@ -99,10 +109,31 @@ export const handlers = [
 
   http.post("/api/users", async ({ request }) => {
     const body = (await request.json()) as {
+      userId?: string;
+      password?: string;
       name?: string;
       department?: string;
       email?: string;
     };
+    const uid = body.userId?.trim();
+    if (!uid) {
+      return HttpResponse.json(
+        { success: false, message: "Login ID is required" },
+        { status: 400 },
+      );
+    }
+    if (mockUsers.some((u) => u.userId === uid)) {
+      return HttpResponse.json(
+        { success: false, message: "Login ID already exists" },
+        { status: 400 },
+      );
+    }
+    if (!body.password?.trim()) {
+      return HttpResponse.json(
+        { success: false, message: "Password is required" },
+        { status: 400 },
+      );
+    }
     if (!body.name?.trim()) {
       return HttpResponse.json(
         { success: false, message: "Name is required" },
@@ -111,11 +142,13 @@ export const handlers = [
     }
     const newUser: User = {
       id: String(nextId++),
+      userId: uid,
       name: body.name.trim(),
       department: body.department?.trim() || undefined,
       email: body.email?.trim() || undefined,
       createdAt: new Date().toISOString(),
     };
+    mockPasswords[uid] = body.password;
     mockUsers.push(newUser);
     return HttpResponse.json({ success: true, data: newUser });
   }),
@@ -129,10 +162,27 @@ export const handlers = [
       );
     }
     const body = (await request.json()) as {
+      userId?: string;
+      password?: string;
       name?: string;
       department?: string;
       email?: string;
     };
+    if (body.userId !== undefined) {
+      const uid = body.userId.trim();
+      if (
+        uid &&
+        uid !== user.userId &&
+        mockUsers.some((u) => u.userId === uid)
+      ) {
+        return HttpResponse.json(
+          { success: false, message: "Login ID already exists" },
+          { status: 400 },
+        );
+      }
+      if (uid) user.userId = uid;
+    }
+    if (body.password?.trim()) mockPasswords[user.userId] = body.password;
     if (body.name !== undefined) user.name = body.name.trim();
     if (body.department !== undefined)
       user.department = body.department?.trim() || undefined;
