@@ -1,0 +1,55 @@
+{
+  "common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading..."
+  },
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Log in",
+    "error": "Login failed."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome."
+  },
+  "users": {
+    "title": "Users",
+    "list": "User List",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "name": "Name",
+    "department": "Department",
+    "email": "Email",
+    "noData": "No users registered.",
+    "notFound": "User not found.",
+    "backToList": "Back to list",
+    "search": "Search",
+    "actions": "Actions",
+    "createSuccess": "User has been created.",
+    "updateSuccess": "User has been updated.",
+    "deleteSuccess": "User has been deleted.",
+    "deleteConfirm": "Are you sure you want to delete this user?",
+    "required": "This field is required.",
+    "invalidEmail": "Invalid email format."
+  },
+  "layout": {
+    "logout": "Log out",
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "accessLog": "Access Log",
+      "departments": "Departments",
+      "settings": "Settings",
+      "settingsAccess": "Access",
+      "settingsNetwork": "Network",
+      "settingsSystem": "System"
+    }
+  }
+}

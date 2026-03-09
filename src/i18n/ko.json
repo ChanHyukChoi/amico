@@ -1,0 +1,55 @@
+{
+  "common": {
+    "submit": "제출",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "수정",
+    "loading": "로딩 중..."
+  },
+  "login": {
+    "title": "로그인",
+    "username": "사용자 ID",
+    "password": "비밀번호",
+    "submit": "로그인",
+    "error": "로그인에 실패했습니다."
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "welcome": "환영합니다."
+  },
+  "users": {
+    "title": "사용자",
+    "list": "사용자 목록",
+    "addUser": "사용자 추가",
+    "editUser": "사용자 수정",
+    "name": "이름",
+    "department": "부서",
+    "email": "이메일",
+    "noData": "등록된 사용자가 없습니다.",
+    "notFound": "사용자를 찾을 수 없습니다.",
+    "backToList": "목록으로",
+    "search": "검색",
+    "actions": "작업",
+    "createSuccess": "사용자가 등록되었습니다.",
+    "updateSuccess": "사용자 정보가 수정되었습니다.",
+    "deleteSuccess": "사용자가 삭제되었습니다.",
+    "deleteConfirm": "이 사용자를 삭제하시겠습니까?",
+    "required": "필수 입력입니다.",
+    "invalidEmail": "올바른 이메일 형식이 아닙니다."
+  },
+  "layout": {
+    "logout": "로그아웃",
+    "nav": {
+      "dashboard": "대시보드",
+      "users": "사용자",
+      "accessLog": "출입 로그",
+      "departments": "부서",
+      "settings": "설정",
+      "settingsAccess": "출입 설정",
+      "settingsNetwork": "네트워크",
+      "settingsSystem": "시스템"
+    }
+  }
+}
