@@ -6,7 +6,8 @@
     "save": "저장",
     "delete": "삭제",
     "edit": "수정",
-    "loading": "로딩 중..."
+    "loading": "로딩 중...",
+    "comingSoon": "구현 예정"
   },
   "login": {
     "title": "로그인",

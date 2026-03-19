@@ -4,7 +4,7 @@ export interface LoginRequest {
   password: string;
 }
 
-/** 로그인 성공 응답 (accessToken만 프론트 저장, refreshToken은 httpOnly 쿠키) */
+/** 로그인 성공 응답 - ASP.NET 백엔드: { "token": "..." } */
 export interface LoginResponse {
-  accessToken: string;
+  token: string;
 }

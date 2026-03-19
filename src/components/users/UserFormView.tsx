@@ -15,7 +15,10 @@ const createUserFormSchema = z
     passwordConfirm: z.string().min(1, "필수 입력입니다."),
     name: z.string().min(1, "필수 입력입니다."),
     department: z.string().optional(),
-    email: z.union([z.string().email("올바른 이메일 형식이 아닙니다."), z.literal("")]),
+    email: z.union([
+      z.string().email("올바른 이메일 형식이 아닙니다."),
+      z.literal(""),
+    ]),
   })
   .refine((data) => data.password === data.passwordConfirm, {
     message: "비밀번호가 일치하지 않습니다.",
@@ -29,13 +32,15 @@ const editUserFormSchema = z
     passwordConfirm: z.string().optional(),
     name: z.string().min(1, "필수 입력입니다."),
     department: z.string().optional(),
-    email: z.union([z.string().email("올바른 이메일 형식이 아닙니다."), z.literal("")]),
+    email: z.union([
+      z.string().email("올바른 이메일 형식이 아닙니다."),
+      z.literal(""),
+    ]),
   })
-  .refine(
-    (data) =>
-      !data.password || data.password === data.passwordConfirm,
-    { message: "비밀번호가 일치하지 않습니다.", path: ["passwordConfirm"] }
-  );
+  .refine((data) => !data.password || data.password === data.passwordConfirm, {
+    message: "비밀번호가 일치하지 않습니다.",
+    path: ["passwordConfirm"],
+  });
 
 type CreateUserFormValues = z.infer<typeof createUserFormSchema>;
 type EditUserFormValues = z.infer<typeof editUserFormSchema>;
@@ -99,7 +104,7 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
     formState: { errors, isSubmitting },
   } = useForm<UserFormValues>({
     resolver: zodResolver(
-      mode === "create" ? createUserFormSchema : editUserFormSchema
+      mode === "create" ? createUserFormSchema : editUserFormSchema,
     ),
     defaultValues: {
       userId: user?.userId ?? "",
@@ -153,14 +158,12 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
   };
 
   if (mode === "edit" && isLoading) {
-    return (
-      <p className="text-muted-foreground">{t("common.loading")}</p>
-    );
+    return <p className="text-gray-500">{t("common.loading")}</p>;
   }
   if (mode === "edit" && !user) {
     return (
       <Box>
-        <p style={{ color: "var(--destructive, #dc2626)" }}>{t("users.notFound")}</p>
+        <p style={{ color: "#dc2626" }}>{t("users.notFound")}</p>
         <Button
           variant="text"
           sx={{ mt: 2, p: 0, minHeight: "auto" }}
@@ -203,7 +206,9 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
               type="password"
               {...registerTextField("passwordConfirm")}
               error={!!errors.passwordConfirm}
-              helperText={errors.passwordConfirm ? t("users.passwordMismatch") : undefined}
+              helperText={
+                errors.passwordConfirm ? t("users.passwordMismatch") : undefined
+              }
               fullWidth
             />
           </>
@@ -224,7 +229,9 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
               placeholder={t("users.passwordChangeOptional")}
               {...registerTextField("passwordConfirm")}
               error={!!errors.passwordConfirm}
-              helperText={errors.passwordConfirm ? t("users.passwordMismatch") : undefined}
+              helperText={
+                errors.passwordConfirm ? t("users.passwordMismatch") : undefined
+              }
               fullWidth
             />
           </>
@@ -254,7 +261,7 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
         />
 
         {errors.root && (
-          <p style={{ color: "var(--destructive, #dc2626)", fontSize: "0.875rem" }}>
+          <p style={{ color: "#dc2626", fontSize: "0.875rem" }}>
             {errors.root.message}
           </p>
         )}

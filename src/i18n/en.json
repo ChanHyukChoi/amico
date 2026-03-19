@@ -6,7 +6,8 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "comingSoon": "Coming soon"
   },
   "login": {
     "title": "Login",

@@ -1,7 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  type GridColDef,
+  type GridRenderCellParams,
+} from "@mui/x-data-grid";
 import {
   IconButton,
   Menu,
@@ -19,19 +23,17 @@ import type { User } from "@/types/user";
 export default function UserListView() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [appliedSearch, setAppliedSearch] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const searchParams = new URLSearchParams(location.search);
-  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-  const search = searchParams.get("search") ?? "";
-
   const { data, isLoading } = useQuery({
-    queryKey: ["users", page, search],
+    queryKey: ["users", page, appliedSearch],
     queryFn: () =>
-      fetchUsers({ page, pageSize: 10, search: search || undefined }),
+      fetchUsers({ page, pageSize: 10, search: appliedSearch || undefined }),
   });
 
   const deleteMutation = useMutation({
@@ -45,17 +47,18 @@ export default function UserListView() {
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const input = form.querySelector<HTMLInputElement>('input[name="search"]');
-    const value = input?.value ?? "";
-    navigate(`/users?search=${encodeURIComponent(value)}&page=1`);
+    setAppliedSearch(searchValue.trim());
+    setPage(1);
   };
 
   const total = data?.success && data.data ? data.data.total : 0;
   const items = data?.success && data.data ? data.data.items : [];
   const pageSize = 10;
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: User) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    user: User,
+  ) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedUser(user);
@@ -79,72 +82,81 @@ export default function UserListView() {
     }
   };
 
-  const handlePaginationModelChange = (model: { page: number; pageSize: number }) => {
-    navigate(
-      `/users?search=${encodeURIComponent(search)}&page=${model.page + 1}`,
-    );
+  const handlePaginationModelChange = (model: {
+    page: number;
+    pageSize: number;
+  }) => {
+    setPage(model.page + 1);
   };
 
   const columns = useMemo<GridColDef<User>[]>(
     () => [
-    {
-      field: "userId",
-      headerName: t("users.userId"),
-      flex: 0.8,
-      minWidth: 100,
-    },
-    {
-      field: "name",
-      headerName: t("users.name"),
-      flex: 1,
-      minWidth: 120,
-      renderCell: (params: GridRenderCellParams<User>) => (
-        <Button
-          variant="text"
-          size="small"
-          sx={{ textTransform: "none", fontWeight: 600 }}
-          onClick={() => navigate(`/users/${params.row.id}`)}
-        >
-          {params.value}
-        </Button>
-      ),
-    },
-    {
-      field: "department",
-      headerName: t("users.department"),
-      flex: 1,
-      minWidth: 100,
-      valueGetter: (_, row) => row.department ?? "-",
-    },
-    {
-      field: "email",
-      headerName: t("users.email"),
-      flex: 1.2,
-      minWidth: 160,
-      valueGetter: (_, row) => row.email ?? "-",
-    },
-    {
-      field: "actions",
-      headerName: t("users.actions"),
-      width: 56,
-      sortable: false,
-      filterable: false,
-      renderCell: (params: GridRenderCellParams<User>) => (
-        <IconButton
-          size="small"
-          onClick={(e) => handleMenuOpen(e, params.row)}
-          aria-label={t("users.actions")}
-        >
-          <MoreVert fontSize="small" />
-        </IconButton>
-      ),
-    },
-  ],
+      {
+        field: "userId",
+        headerName: t("users.userId"),
+        flex: 0.8,
+        minWidth: 100,
+      },
+      {
+        field: "name",
+        headerName: t("users.name"),
+        flex: 1,
+        minWidth: 120,
+        renderCell: (params: GridRenderCellParams<User>) => (
+          <Button
+            variant="text"
+            size="small"
+            sx={{ textTransform: "none", fontWeight: 600 }}
+            onClick={() => navigate(`/users/${params.row.id}`)}
+          >
+            {params.value}
+          </Button>
+        ),
+      },
+      {
+        field: "department",
+        headerName: t("users.department"),
+        flex: 1,
+        minWidth: 100,
+        valueGetter: (_, row) => row.department ?? "-",
+      },
+      {
+        field: "email",
+        headerName: t("users.email"),
+        flex: 1.2,
+        minWidth: 160,
+        valueGetter: (_, row) => row.email ?? "-",
+      },
+      {
+        field: "actions",
+        headerName: t("users.actions"),
+        width: 56,
+        sortable: false,
+        filterable: false,
+        renderCell: (params: GridRenderCellParams<User>) => (
+          <IconButton
+            size="small"
+            onClick={(e) => handleMenuOpen(e, params.row)}
+            aria-label={t("users.actions")}
+          >
+            <MoreVert fontSize="small" />
+          </IconButton>
+        ),
+      },
+    ],
     [t, navigate],
   );
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        flex: 1,
+        minHeight: 0,
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -154,7 +166,10 @@ export default function UserListView() {
           gap: 2,
         }}
       >
-        <Box component="h1" sx={{ fontSize: "1.5rem", fontWeight: 600, m: 0 }}>
+        <Box
+          component="h1"
+          sx={{ fontSize: "1.5rem", fontWeight: 600, m: 0 }}
+        >
           {t("users.list")}
         </Box>
         <Button variant="contained" onClick={() => navigate("/users/new")}>
@@ -170,7 +185,8 @@ export default function UserListView() {
         <TextField
           name="search"
           type="text"
-          defaultValue={search}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
           placeholder={t("users.search")}
           size="small"
           sx={{ maxWidth: 280 }}
@@ -185,7 +201,7 @@ export default function UserListView() {
           {t("common.loading")}
         </Box>
       ) : (
-        <Box sx={{ height: 400, width: "100%" }}>
+        <Box sx={{ flex: 1, minHeight: 300, width: "100%" }}>
           <DataGrid
             rows={items}
             columns={columns}
@@ -227,10 +243,7 @@ export default function UserListView() {
           <Edit fontSize="small" sx={{ mr: 1 }} />
           {t("common.edit")}
         </MenuItem>
-        <MenuItem
-          onClick={handleDelete}
-          sx={{ color: "error.main" }}
-        >
+        <MenuItem onClick={handleDelete} sx={{ color: "error.main" }}>
           <Delete fontSize="small" sx={{ mr: 1 }} />
           {t("common.delete")}
         </MenuItem>

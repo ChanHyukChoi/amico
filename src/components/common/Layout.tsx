@@ -1,6 +1,6 @@
-import { Outlet } from 'react-router-dom'
-import { TopBar } from '@/components/common/TopBar'
-import { Sidebar } from '@/components/common/Sidebar'
+import { Outlet } from "react-router-dom";
+import { TopBar } from "@/components/common/TopBar";
+import { Sidebar } from "@/components/common/Sidebar";
 
 export function Layout() {
   return (
@@ -8,10 +8,10 @@ export function Layout() {
       <TopBar />
       <div className="flex-1 flex min-h-0">
         <Sidebar />
-        <main className="flex-1 min-w-0 p-4 overflow-auto bg-white">
+        <main className="flex-1 min-w-0 min-h-0 flex flex-col p-4 overflow-auto bg-white">
           <Outlet />
         </main>
       </div>
     </div>
-  )
+  );
 }

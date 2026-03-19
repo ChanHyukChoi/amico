@@ -1,13 +1,15 @@
-import { useTranslation } from 'react-i18next'
-import { logout } from '@/api/auth'
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { logout } from "@/api/auth";
 
 export function TopBar() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout()
-    window.location.href = '/login'
-  }
+    logout();
+    navigate("/login");
+  };
 
   return (
     <header className="h-14 shrink-0 border-b bg-white px-4 flex items-center justify-between">
@@ -17,8 +19,8 @@ export function TopBar() {
         onClick={handleLogout}
         className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded hover:bg-gray-100"
       >
-        {t('layout.logout')}
+        {t("layout.logout")}
       </button>
     </header>
-  )
+  );
 }
