@@ -11,7 +11,7 @@ export async function login(
   body: LoginRequest
 ): Promise<ApiResponse<LoginResponse>> {
   try {
-    const res = await apiFetch('/api/auth/login', {
+    const res = await apiFetch('/auth/login', {
       method: 'POST',
       body: JSON.stringify(body),
     });

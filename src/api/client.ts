@@ -1,7 +1,8 @@
 import { useAuthStore } from '@/store/authStore';
 
-/** 상대 경로 /api 전용 fetch. baseURL 사용 금지. */
-async function apiFetch(
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
+
+async function apiFetch( 
   path: string,
   options: RequestInit = {}
 ): Promise<Response> {
@@ -14,11 +15,14 @@ async function apiFetch(
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
 
-  const res = await fetch(path, { ...options, headers });
+  const res = await fetch(`${BASE_URL}${path}`, {
+    ...options,
+    headers,
+    credentials: 'include',
+  });
 
   if (res.status === 401) {
     useAuthStore.getState().clearAuth();
-    // 라우터/가드에서 /login 리다이렉트 처리
   }
 
   return res;

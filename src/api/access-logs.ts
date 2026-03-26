@@ -16,7 +16,7 @@ export async function fetchAccessLogs(
   if (params?.deviceId != null)
     searchParams.set("deviceId", String(params.deviceId));
   const query = searchParams.toString();
-  const path = query ? `/api/hid/access-logs?${query}` : "/api/hid/access-logs";
+  const path = query ? `/hid/access-logs?${query}` : "/hid/access-logs";
   const res = await apiFetch(path);
   return res.json() as Promise<ApiResponse<PaginatedResponse<AccessLog>>>;
 }
@@ -24,7 +24,7 @@ export async function fetchAccessLogs(
 export async function deleteAccessLog(
   id: number,
 ): Promise<ApiResponse<void>> {
-  const res = await apiFetch(`/api/hid/access-logs/${id}`, {
+  const res = await apiFetch(`/hid/access-logs/${id}`, {
     method: "DELETE",
   });
   return res.json() as Promise<ApiResponse<void>>;
