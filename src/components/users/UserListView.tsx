@@ -38,8 +38,10 @@ export default function UserListView() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+    onSuccess: (res) => {
+      if (res.success) {
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+      }
       setAnchorEl(null);
       setSelectedUser(null);
     },

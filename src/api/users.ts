@@ -1,4 +1,4 @@
-import { apiFetch } from "@/api/client";
+import { requestEnvelope } from "@/api/client";
 import type { ApiResponse, PaginatedResponse } from "@/types/common";
 import type {
   User,
@@ -7,7 +7,6 @@ import type {
   UpdateUserRequest,
 } from "@/types/user";
 
-/** 사용자 목록 조회 */
 export async function fetchUsers(
   params?: UserListParams,
 ): Promise<ApiResponse<PaginatedResponse<User>>> {
@@ -18,41 +17,32 @@ export async function fetchUsers(
   if (params?.search) searchParams.set("search", params.search);
   const query = searchParams.toString();
   const path = query ? `/api/users?${query}` : "/api/users";
-  const res = await apiFetch(path);
-  return res.json() as Promise<ApiResponse<PaginatedResponse<User>>>;
+  return requestEnvelope<PaginatedResponse<User>>(path);
 }
 
-/** 사용자 단건 조회 */
 export async function fetchUser(id: string): Promise<ApiResponse<User>> {
-  const res = await apiFetch(`/api/users/${id}`);
-  return res.json() as Promise<ApiResponse<User>>;
+  return requestEnvelope<User>(`/api/users/${id}`);
 }
 
-/** 사용자 생성 */
 export async function createUser(
   body: CreateUserRequest,
 ): Promise<ApiResponse<User>> {
-  const res = await apiFetch("/api/users", {
+  return requestEnvelope<User>("/api/users", {
     method: "POST",
     body: JSON.stringify(body),
   });
-  return res.json() as Promise<ApiResponse<User>>;
 }
 
-/** 사용자 수정 */
 export async function updateUser(
   id: string,
   body: UpdateUserRequest,
 ): Promise<ApiResponse<User>> {
-  const res = await apiFetch(`/api/users/${id}`, {
+  return requestEnvelope<User>(`/api/users/${id}`, {
     method: "PUT",
     body: JSON.stringify(body),
   });
-  return res.json() as Promise<ApiResponse<User>>;
 }
 
-/** 사용자 삭제 */
 export async function deleteUser(id: string): Promise<ApiResponse<void>> {
-  const res = await apiFetch(`/api/users/${id}`, { method: "DELETE" });
-  return res.json() as Promise<ApiResponse<void>>;
+  return requestEnvelope<void>(`/api/users/${id}`, { method: "DELETE" });
 }

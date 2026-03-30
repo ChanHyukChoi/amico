@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { fetchUser, createUser, updateUser } from "@/api/users";
+import { getApiErrorMessage } from "@/api/apiErrorMessages";
+import { API_ERROR_CODES } from "@/api/apiErrorCodes";
 import type { CreateUserRequest, UpdateUserRequest } from "@/types/user";
 import { Button, TextField, Box, Stack } from "@mui/material";
 
@@ -61,14 +63,21 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
   const createMutation = useMutation({
     mutationFn: createUser,
     onSuccess: (res) => {
-      if (res.success && res.data) {
+      if (!res.success) {
+        if (res.code === API_ERROR_CODES.USER_ID_DUPLICATE) {
+          setError("userId", {
+            message: getApiErrorMessage(t, res.code, res.status),
+          });
+        } else {
+          setError("root", {
+            message: getApiErrorMessage(t, res.code, res.status),
+          });
+        }
+        return;
+      }
+      if (res.data) {
         queryClient.invalidateQueries({ queryKey: ["users"] });
         navigate("/users");
-      } else {
-        setError("root", {
-          message:
-            (res as { message?: string }).message ?? "저장에 실패했습니다.",
-        });
       }
     },
     onError: (err: Error) => {
@@ -79,16 +88,21 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
   const updateMutation = useMutation({
     mutationFn: (body: UpdateUserRequest) => updateUser(id!, body),
     onSuccess: (res) => {
-      if (res.success) {
-        queryClient.invalidateQueries({ queryKey: ["users"] });
-        queryClient.invalidateQueries({ queryKey: ["user", id] });
-        navigate("/users");
-      } else {
-        setError("root", {
-          message:
-            (res as { message?: string }).message ?? "수정에 실패했습니다.",
-        });
+      if (!res.success) {
+        if (res.code === API_ERROR_CODES.USER_ID_DUPLICATE) {
+          setError("userId", {
+            message: getApiErrorMessage(t, res.code, res.status),
+          });
+        } else {
+          setError("root", {
+            message: getApiErrorMessage(t, res.code, res.status),
+          });
+        }
+        return;
       }
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["user", id] });
+      navigate("/users");
     },
     onError: (err: Error) => {
       setError("root", { message: err.message || "수정에 실패했습니다." });
@@ -144,8 +158,11 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
         password: v.password,
         name,
       };
+
       if (dept) body.department = dept;
+
       if (em) body.email = em;
+
       createMutation.mutate(body);
     } else {
       const v = values as EditUserFormValues;
@@ -186,7 +203,7 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
           label={`${t("users.userId")} *`}
           {...registerTextField("userId")}
           error={!!errors.userId}
-          helperText={errors.userId ? t("users.required") : undefined}
+          helperText={errors.userId?.message}
           InputProps={{ readOnly: mode === "edit" }}
           fullWidth
         />

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { login } from "@/api/auth";
+import { getApiErrorMessage } from "@/api/apiErrorMessages";
 import type { LoginRequest } from "@/types/auth";
 
 const schema = z.object({
@@ -36,7 +37,9 @@ export function LoginPage() {
     if (result.success) {
       navigate(from, { replace: true });
     } else {
-      setError("root", { message: result.message ?? t("login.error") });
+      setError("root", {
+        message: getApiErrorMessage(t, result.code, result.status),
+      });
     }
   };
 

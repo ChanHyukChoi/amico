@@ -46,6 +46,18 @@
     "passwordChangeOptional": "Leave blank to keep current",
     "userIdExists": "This login ID is already in use."
   },
+  "apiErrors": {
+    "AUTH_INVALID_CREDENTIALS": "Invalid username or password.",
+    "AUTH_TOKEN_INVALID": "Your session expired or the token is invalid. Please sign in again.",
+    "USER_INVALID_ID": "Invalid user identifier.",
+    "USER_NOT_FOUND": "User not found.",
+    "USER_VALIDATION_REQUIRED": "Required fields are missing.",
+    "USER_ID_DUPLICATE": "This login ID is already in use.",
+    "ACCESS_LOG_NOT_FOUND": "Access log not found.",
+    "UNKNOWN": "An unknown error occurred.",
+    "httpDetail": " (HTTP {{status}})",
+    "CLIENT_NETWORK_ERROR": "Cannot reach the server."
+  },
   "layout": {
     "logout": "Log out",
     "nav": {
