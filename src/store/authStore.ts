@@ -1,6 +1,6 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-const STORAGE_KEY = 'hid-amico-access-token';
+const STORAGE_KEY = "hid-amico-access-token";
 
 function getStoredToken(): string | null {
   try {
@@ -23,13 +23,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       if (token) localStorage.setItem(STORAGE_KEY, token);
       else localStorage.removeItem(STORAGE_KEY);
-    } catch {}
+    } catch {
+      void 0;
+    }
     set({ accessToken: token });
   },
   clearAuth: () => {
     try {
       localStorage.removeItem(STORAGE_KEY);
-    } catch {}
+    } catch {
+      void 0;
+    }
     set({ accessToken: null });
   },
   isAuthenticated: () => !!get().accessToken,

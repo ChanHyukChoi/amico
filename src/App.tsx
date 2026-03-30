@@ -46,10 +46,7 @@ function App() {
                 path="settings/network"
                 element={<SettingsNetworkPage />}
               />
-              <Route
-                path="settings/system"
-                element={<SettingsSystemPage />}
-              />
+              <Route path="settings/system" element={<SettingsSystemPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

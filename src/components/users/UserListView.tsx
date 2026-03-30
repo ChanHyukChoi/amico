@@ -55,10 +55,7 @@ export default function UserListView() {
   const items = data?.success && data.data ? data.data.items : [];
   const pageSize = 10;
 
-  const handleMenuOpen = (
-    event: React.MouseEvent<HTMLElement>,
-    user: User,
-  ) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: User) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedUser(user);
@@ -166,10 +163,7 @@ export default function UserListView() {
           gap: 2,
         }}
       >
-        <Box
-          component="h1"
-          sx={{ fontSize: "1.5rem", fontWeight: 600, m: 0 }}
-        >
+        <Box component="h1" sx={{ fontSize: "1.5rem", fontWeight: 600, m: 0 }}>
           {t("users.list")}
         </Box>
         <Button variant="contained" onClick={() => navigate("/users/new")}>
@@ -197,9 +191,7 @@ export default function UserListView() {
       </Box>
 
       {isLoading ? (
-        <Box sx={{ color: "text.secondary", py: 4 }}>
-          {t("common.loading")}
-        </Box>
+        <Box sx={{ color: "text.secondary", py: 4 }}>{t("common.loading")}</Box>
       ) : (
         <Box sx={{ flex: 1, minHeight: 300, width: "100%" }}>
           <DataGrid

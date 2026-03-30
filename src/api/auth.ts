@@ -1,18 +1,18 @@
-import { apiFetch } from '@/api/client';
-import type { LoginRequest, LoginResponse } from '@/types/auth';
-import type { ApiResponse } from '@/types/common';
-import { useAuthStore } from '@/store/authStore';
+import { apiFetch } from "@/api/client";
+import type { LoginRequest, LoginResponse } from "@/types/auth";
+import type { ApiResponse } from "@/types/common";
+import { useAuthStore } from "@/store/authStore";
 
 /**
  * POST /auth/login
  * 백엔드 응답: { "token": "JWT토큰" } (성공) | HTTP 4xx (실패)
  */
 export async function login(
-  body: LoginRequest
+  body: LoginRequest,
 ): Promise<ApiResponse<LoginResponse>> {
   try {
-    const res = await apiFetch('/auth/login', {
-      method: 'POST',
+    const res = await apiFetch("/auth/login", {
+      method: "POST",
       body: JSON.stringify(body),
     });
 
@@ -23,7 +23,7 @@ export async function login(
     }
 
     // 401 등 에러 응답
-    let message = '로그인에 실패했습니다.';
+    let message = "로그인에 실패했습니다.";
     try {
       const err = (await res.json()) as { message?: string };
       if (err.message) message = err.message;
@@ -32,7 +32,7 @@ export async function login(
     }
     return { success: false, message };
   } catch {
-    return { success: false, message: '서버에 연결할 수 없습니다.' };
+    return { success: false, message: "서버에 연결할 수 없습니다." };
   }
 }
 
