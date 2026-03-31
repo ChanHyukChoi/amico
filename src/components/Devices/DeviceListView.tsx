@@ -1,3 +1,5 @@
+//#region imports
+
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
@@ -6,38 +8,36 @@ import {
   type GridColDef,
   type GridRenderCellParams,
 } from "@mui/x-data-grid";
-import { IconButton, Button, TextField, Box, type Theme } from "@mui/material";
-import { MoreVert } from "@mui/icons-material";
+import { Button, TextField, Box, type Theme } from "@mui/material";
 import { useMemo, useState } from "react";
-import { fetchUsers, deleteUser } from "@/api/users";
-import type { User } from "@/types/user";
+import { fetchDevices, deleteDevice } from "@/api/devices";
+import type { Device } from "@/types/device";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
 
-export default function UserListView() {
+//#endregion
+export default function DeviceListView() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { page, setPage, onPaginationModelChange } = useServerPaginationPage(
-    1,
-  );
+  const { page, setPage, onPaginationModelChange } = useServerPaginationPage(1);
   const [appliedSearch, setAppliedSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
-  const rowMenu = useRowActionMenu<User>();
+  const rowMenu = useRowActionMenu<Device>();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["users", page, appliedSearch],
+    queryKey: ["devices", page, appliedSearch],
     queryFn: () =>
-      fetchUsers({ page, pageSize: 10, search: appliedSearch || undefined }),
+      fetchDevices({ page, pageSize: 10, search: appliedSearch || undefined }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteUser,
+    mutationFn: deleteDevice,
     onSuccess: (res) => {
       if (res.success) {
-        queryClient.invalidateQueries({ queryKey: ["users"] });
+        queryClient.invalidateQueries({ queryKey: ["devices"] });
       }
       rowMenu.closeMenu();
     },
@@ -54,71 +54,53 @@ export default function UserListView() {
   const pageSize = 10;
 
   const handleEdit = () => {
-    if (rowMenu.selectedRow) navigate(`/users/${rowMenu.selectedRow.id}`);
+    if (rowMenu.selectedRow) navigate(`/devices/${rowMenu.selectedRow.id}`);
     rowMenu.closeMenu();
   };
 
   const handleDelete = () => {
-    if (rowMenu.selectedRow && window.confirm(t("users.deleteConfirm"))) {
+    if (rowMenu.selectedRow && window.confirm(t("devices.deleteConfirm"))) {
       deleteMutation.mutate(rowMenu.selectedRow.id);
     } else {
       rowMenu.closeMenu();
     }
   };
 
-  const columns = useMemo<GridColDef<User>[]>(
+  const columns = useMemo<GridColDef<Device>[]>(
     () => [
       {
-        field: "userId",
-        headerName: t("users.userId"),
-        flex: 0.8,
-        minWidth: 100,
-      },
-      {
         field: "name",
-        headerName: t("users.name"),
+        headerName: t("devices.name"),
         flex: 1,
         minWidth: 120,
-        renderCell: (params: GridRenderCellParams<User>) => (
+        renderCell: (params: GridRenderCellParams<Device>) => (
           <Button
             variant="text"
             size="small"
             sx={{ textTransform: "none", fontWeight: 600 }}
-            onClick={() => navigate(`/users/${params.row.id}`)}
+            onClick={() => navigate(`/devices/${params.row.id}`)}
           >
             {params.value}
           </Button>
         ),
       },
       {
-        field: "department",
-        headerName: t("users.department"),
+        field: "ip",
+        headerName: t("devices.ip"),
+        flex: 1,
+        minWidth: 120,
+      },
+      {
+        field: "type",
+        headerName: t("devices.type"),
+        flex: 0.8,
+        minWidth: 90,
+      },
+      {
+        field: "model",
+        headerName: t("devices.model"),
         flex: 1,
         minWidth: 100,
-        valueGetter: (_, row) => row.department ?? "-",
-      },
-      {
-        field: "email",
-        headerName: t("users.email"),
-        flex: 1.2,
-        minWidth: 160,
-        valueGetter: (_, row) => row.email ?? "-",
-      },
-      {
-        field: "actions",
-        headerName: t("users.actions"),
-        width: 56,
-        sortable: false,
-        filterable: false,
-        renderCell: (params: GridRenderCellParams<User>) => (
-          <IconButton
-            size="small"
-            onClick={(e) => rowMenu.openMenu(e, params.row)}
-            aria-label={t("users.actions")}
-          >
-            <MoreVert fontSize="small" />
-          </IconButton>
-        ),
       },
     ],
     [t, navigate, rowMenu.openMenu],
@@ -135,9 +117,9 @@ export default function UserListView() {
       }}
     >
       <ListPageHeader
-        title={t("users.list")}
-        actionLabel={t("users.addUser")}
-        onAction={() => navigate("/users/new")}
+        title={t("devices.list")}
+        actionLabel={t("devices.addDevice")}
+        onAction={() => navigate("/devices/new")}
       />
 
       <Box
@@ -150,12 +132,12 @@ export default function UserListView() {
           type="text"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          placeholder={t("users.search")}
+          placeholder={t("devices.search")}
           size="small"
           sx={{ maxWidth: 280 }}
         />
         <Button type="submit" variant="outlined">
-          {t("users.search")}
+          {t("devices.search")}
         </Button>
       </Box>
 
@@ -178,7 +160,7 @@ export default function UserListView() {
             loading={isLoading}
             disableRowSelectionOnClick
             localeText={{
-              noRowsLabel: t("users.noData"),
+              noRowsLabel: t("devices.noData"),
             }}
             sx={{
               "& .MuiDataGrid-cell:focus": { outline: "none" },

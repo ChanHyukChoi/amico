@@ -46,6 +46,18 @@
     "passwordChangeOptional": "Leave blank to keep current",
     "userIdExists": "This login ID is already in use."
   },
+  "devices": {
+    "list": "Device list",
+    "addDevice": "Add device",
+    "name": "Name",
+    "ip": "IP address",
+    "type": "Type",
+    "model": "Model",
+    "search": "Search",
+    "actions": "Actions",
+    "noData": "No devices registered.",
+    "deleteConfirm": "Are you sure you want to delete this device?"
+  },
   "apiErrors": {
     "AUTH_INVALID_CREDENTIALS": "Invalid username or password.",
     "AUTH_TOKEN_INVALID": "Your session expired or the token is invalid. Please sign in again.",
@@ -63,6 +75,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "users": "Users",
+      "devices": "Devices",
       "accessLog": "Access Log",
       "departments": "Departments",
       "settings": "Settings",

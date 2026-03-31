@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 const navItems: { to: string; key: string }[] = [
   { to: "/", key: "layout.nav.dashboard" },
   { to: "/users", key: "layout.nav.users" },
+  { to: "/devices", key: "layout.nav.devices" },
   { to: "/access-log", key: "layout.nav.accessLog" },
   { to: "/departments", key: "layout.nav.departments" },
   { to: "/settings/access", key: "layout.nav.settingsAccess" },

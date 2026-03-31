@@ -9,9 +9,7 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { UsersPage } from "@/pages/UsersPage";
 import { AccessLogPage } from "@/pages/AccessLogPage";
 import { DepartmentsPage } from "@/pages/DepartmentsPage";
-import { SettingsAccessPage } from "@/pages/settings/SettingsAccessPage";
-import { SettingsNetworkPage } from "@/pages/settings/SettingsNetworkPage";
-import { SettingsSystemPage } from "@/pages/settings/SettingsSystemPage";
+import { DevicesPage } from "@/pages/DevicesPage";
 
 const queryClient = new QueryClient();
 
@@ -41,12 +39,9 @@ function App() {
               <Route path="users/:id" element={<UsersPage />} />
               <Route path="access-log" element={<AccessLogPage />} />
               <Route path="departments" element={<DepartmentsPage />} />
-              <Route path="settings/access" element={<SettingsAccessPage />} />
-              <Route
-                path="settings/network"
-                element={<SettingsNetworkPage />}
-              />
-              <Route path="settings/system" element={<SettingsSystemPage />} />
+              <Route path="devices" element={<DevicesPage />} />
+              <Route path="devices/new" element={<DevicesPage />} />
+              <Route path="devices/:id" element={<DevicesPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

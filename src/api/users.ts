@@ -20,7 +20,7 @@ export async function fetchUsers(
   return requestEnvelope<PaginatedResponse<User>>(path);
 }
 
-export async function fetchUser(id: string): Promise<ApiResponse<User>> {
+export async function fetchUser(id: number): Promise<ApiResponse<User>> {
   return requestEnvelope<User>(`/api/users/${id}`);
 }
 
@@ -34,7 +34,7 @@ export async function createUser(
 }
 
 export async function updateUser(
-  id: string,
+  id: number,
   body: UpdateUserRequest,
 ): Promise<ApiResponse<User>> {
   return requestEnvelope<User>(`/api/users/${id}`, {
@@ -43,6 +43,6 @@ export async function updateUser(
   });
 }
 
-export async function deleteUser(id: string): Promise<ApiResponse<void>> {
+export async function deleteUser(id: number): Promise<ApiResponse<void>> {
   return requestEnvelope<void>(`/api/users/${id}`, { method: "DELETE" });
 }

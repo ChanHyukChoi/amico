@@ -56,7 +56,7 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
 
   const { data: userData, isLoading } = useQuery({
     queryKey: ["user", id],
-    queryFn: () => fetchUser(id!),
+    queryFn: () => fetchUser(Number(id)),
     enabled: mode === "edit" && !!id,
   });
 
@@ -86,7 +86,7 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (body: UpdateUserRequest) => updateUser(id!, body),
+    mutationFn: (body: UpdateUserRequest) => updateUser(Number(id), body),
     onSuccess: (res) => {
       if (!res.success) {
         if (res.code === API_ERROR_CODES.USER_ID_DUPLICATE) {
@@ -101,7 +101,7 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
         return;
       }
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["user", id] });
+      queryClient.invalidateQueries({ queryKey: ["user", Number(id)] });
       navigate("/users");
     },
     onError: (err: Error) => {

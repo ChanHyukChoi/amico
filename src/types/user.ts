@@ -1,12 +1,13 @@
 /** 사용자 엔티티 */
 export interface User {
-  id: string;
+  id: number;
   /** 로그인 ID */
   userId: string;
   name: string;
   department?: string;
   email?: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 /** 사용자 목록 조회 파라미터 */
