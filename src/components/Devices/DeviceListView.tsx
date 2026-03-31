@@ -69,8 +69,8 @@ export default function DeviceListView() {
   const columns = useMemo<GridColDef<Device>[]>(
     () => [
       {
-        field: "name",
-        headerName: t("devices.name"),
+        field: "description",
+        headerName: t("devices.description"),
         flex: 1,
         minWidth: 120,
         renderCell: (params: GridRenderCellParams<Device>) => (
@@ -100,6 +100,18 @@ export default function DeviceListView() {
         field: "model",
         headerName: t("devices.model"),
         flex: 1,
+        minWidth: 100,
+      },
+      {
+        field: "userId",
+        headerName: t("devices.userId"),
+        flex: 0.8,
+        minWidth: 100,
+      },
+      {
+        field: "isActive",
+        headerName: t("devices.isActive"),
+        flex: 0.8,
         minWidth: 100,
       },
     ],

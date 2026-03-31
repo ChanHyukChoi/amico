@@ -49,13 +49,21 @@
   "devices": {
     "list": "장치 목록",
     "addDevice": "장치 추가",
+    "editDevice": "장치 수정",
     "name": "이름",
+    "description": "설명",
     "ip": "IP 주소",
     "type": "유형",
     "model": "모델",
+    "userId": "사용자 ID",
+    "password": "비밀번호",
+    "passwordChangeOptional": "변경 시에만 입력",
+    "isActive": "활성",
     "search": "검색",
     "actions": "작업",
     "noData": "등록된 장치가 없습니다.",
+    "notFound": "장치를 찾을 수 없습니다.",
+    "backToList": "목록으로",
     "deleteConfirm": "이 장치를 삭제하시겠습니까?"
   },
   "apiErrors": {

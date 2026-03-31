@@ -49,13 +49,21 @@
   "devices": {
     "list": "Device list",
     "addDevice": "Add device",
+    "editDevice": "Edit device",
     "name": "Name",
+    "description": "Description",
     "ip": "IP address",
     "type": "Type",
     "model": "Model",
+    "userId": "User ID",
+    "password": "Password",
+    "passwordChangeOptional": "Leave blank to keep current",
+    "isActive": "Active",
     "search": "Search",
     "actions": "Actions",
     "noData": "No devices registered.",
+    "notFound": "Device not found.",
+    "backToList": "Back to list",
     "deleteConfirm": "Are you sure you want to delete this device?"
   },
   "apiErrors": {

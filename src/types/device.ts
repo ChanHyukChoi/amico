@@ -12,11 +12,11 @@ export interface DeviceSettings {
 
 export interface Device {
   id: number;
-  name: string;
+  description: string;
   ip: string;
   type: string;
   model: string;
-  userId: number;
+  userId: string;
   password: string;
   settings?: DeviceSettings;
   isActive: boolean;
@@ -31,21 +31,23 @@ export interface DeviceListParams {
 }
 
 export interface CreateDeviceRequest {
-  name: string;
+  description: string;
   ip: string;
   type: string;
   model: string;
-  userId: number;
+  userId: string;
   password: string;
   settings?: Object;
+  isActive: boolean;
 }
 
 export interface UpdateDeviceRequest {
-  name?: string;
+  description?: string;
   ip?: string;
   type?: string;
   model?: string;
-  userId?: number;
+  userId?: string;
   password?: string;
   settings?: Object;
+  isActive?: boolean;
 }
