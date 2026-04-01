@@ -20,7 +20,7 @@ export function DeviceSettingsSectionPanel({
   const { t } = useTranslation();
 
   return (
-    <Stack spacing={2} sx={{ maxWidth: 720 }}>
+    <Stack spacing={2}>
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}

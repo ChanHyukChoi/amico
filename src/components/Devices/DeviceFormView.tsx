@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { fetchDevice, createDevice, updateDevice } from "@/api/devices";
@@ -9,12 +9,17 @@ import { getApiErrorMessage } from "@/api/apiErrorMessages";
 import { API_ERROR_CODES } from "@/api/apiErrorCodes";
 import type { CreateDeviceRequest, UpdateDeviceRequest } from "@/types/device";
 import {
+  DEVICE_MODEL_OPTIONS,
+  getDeviceModelLabel,
+} from "@/constants/deviceModelOptions";
+import {
   Button,
   TextField,
   Box,
   Stack,
   Checkbox,
   FormControlLabel,
+  MenuItem,
 } from "@mui/material";
 
 const createDeviceFormSchema = z.object({
@@ -110,6 +115,7 @@ export default function DeviceFormView({ mode }: { mode: "create" | "edit" }) {
     register,
     handleSubmit,
     setError,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<DeviceFormValues>({
     resolver: zodResolver(
@@ -119,7 +125,7 @@ export default function DeviceFormView({ mode }: { mode: "create" | "edit" }) {
       description: device?.description ?? "",
       ip: device?.ip ?? "",
       type: device?.type ?? "",
-      model: device?.model ?? "",
+      model: device?.model ?? "0",
       userId: device?.userId != null ? String(device.userId) : "",
       password: "",
       isActive: device?.isActive ?? true,
@@ -130,7 +136,7 @@ export default function DeviceFormView({ mode }: { mode: "create" | "edit" }) {
             description: device.description ?? "",
             ip: device.ip ?? "",
             type: device.type ?? "",
-            model: device.model ?? "",
+            model: device.model ?? "0",
             userId: String(device.userId),
             password: "",
             isActive: device.isActive ?? true,
@@ -222,12 +228,28 @@ export default function DeviceFormView({ mode }: { mode: "create" | "edit" }) {
           fullWidth
         />
 
-        <TextField
-          label={`${t("devices.model")} *`}
-          {...registerTextField("model")}
-          error={!!errors.model}
-          helperText={errors.model?.message}
-          fullWidth
+        <Controller
+          name="model"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              select
+              label={`${t("devices.model")} *`}
+              value={field.value ?? "0"}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              inputRef={field.ref}
+              error={!!errors.model}
+              helperText={errors.model?.message}
+              fullWidth
+            >
+              {DEVICE_MODEL_OPTIONS.map((opt) => (
+                <MenuItem key={opt.value} value={opt.value}>
+                  {getDeviceModelLabel(opt.value, t)}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
         />
 
         <TextField

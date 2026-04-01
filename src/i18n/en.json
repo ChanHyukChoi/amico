@@ -7,7 +7,8 @@
     "delete": "Delete",
     "edit": "Edit",
     "loading": "Loading...",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "selectNone": "None"
   },
   "login": {
     "title": "Login",
@@ -60,12 +61,16 @@
     "passwordChangeOptional": "Leave blank to keep current",
     "isActive": "Active",
     "search": "Search",
-    "actions": "Actions",
+    "controls": "Controls",
+    "actions": "",
     "noData": "No devices registered.",
     "notFound": "Device not found.",
     "backToList": "Back to list",
     "deleteConfirm": "Are you sure you want to delete this device?",
     "rowMenuSettings": "Settings",
+    "controlsRestart": "Restart",
+    "controlsReset": "Reset",
+    "controlsUpdate": "Update",
     "settingsTitle": "Device settings (#{{id}})",
     "settingsSaveSection": "Save this section",
     "settingsEditDevice": "Edit device info",

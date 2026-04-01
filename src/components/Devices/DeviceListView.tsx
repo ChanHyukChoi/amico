@@ -8,7 +8,14 @@ import {
   type GridColDef,
   type GridRenderCellParams,
 } from "@mui/x-data-grid";
-import { Button, TextField, Box, type Theme, IconButton, MenuItem } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Box,
+  type Theme,
+  IconButton,
+  MenuItem,
+} from "@mui/material";
 import { MoreVert, Settings } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import { fetchDevices, deleteDevice } from "@/api/devices";
@@ -17,6 +24,8 @@ import { useRowActionMenu } from "@/hooks/useRowActionMenu";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
+import { DeviceControlActionsMenu } from "@/components/common/DeviceControlActionsMenu";
+import { getDeviceModelLabel } from "@/constants/deviceModelOptions";
 
 //#endregion
 export default function DeviceListView() {
@@ -26,6 +35,7 @@ export default function DeviceListView() {
   const { page, setPage, onPaginationModelChange } = useServerPaginationPage(1);
   const [appliedSearch, setAppliedSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const controlMenu = useRowActionMenu<Device>();
   const rowMenu = useRowActionMenu<Device>();
 
   const { data, isLoading } = useQuery({
@@ -74,6 +84,27 @@ export default function DeviceListView() {
     rowMenu.closeMenu();
   };
 
+  const handleRestart = () => {
+    if (controlMenu.selectedRow) {
+      //restartDevice(controlMenu.selectedRow.id);
+    }
+    controlMenu.closeMenu();
+  };
+
+  const handleReset = () => {
+    if (controlMenu.selectedRow) {
+      //resetDevice(controlMenu.selectedRow.id);
+    }
+    controlMenu.closeMenu();
+  };
+
+  const handleUpdate = () => {
+    if (controlMenu.selectedRow) {
+      //updateDevice(controlMenu.selectedRow.id);
+    }
+    controlMenu.closeMenu();
+  };
+
   const columns = useMemo<GridColDef<Device>[]>(
     () => [
       {
@@ -109,6 +140,8 @@ export default function DeviceListView() {
         headerName: t("devices.model"),
         flex: 1,
         minWidth: 100,
+        renderCell: (params: GridRenderCellParams<Device>) =>
+          getDeviceModelLabel(String(params.value ?? ""), t),
       },
       {
         field: "userId",
@@ -121,6 +154,21 @@ export default function DeviceListView() {
         headerName: t("devices.isActive"),
         flex: 0.8,
         minWidth: 100,
+      },
+      {
+        field: "controls",
+        headerName: t("devices.controls"),
+        width: 56,
+        sortable: false,
+        filterable: false,
+        renderCell: (params: GridRenderCellParams<Device>) => (
+          <IconButton
+            size="small"
+            onClick={(e) => controlMenu.openMenu(e, params.row)}
+          >
+            <MoreVert fontSize="small" />
+          </IconButton>
+        ),
       },
       {
         field: "actions",
@@ -138,7 +186,7 @@ export default function DeviceListView() {
         ),
       },
     ],
-    [t, navigate, rowMenu.openMenu],
+    [t, navigate, rowMenu.openMenu, controlMenu.openMenu],
   );
 
   return (
@@ -209,6 +257,15 @@ export default function DeviceListView() {
           />
         </Box>
       )}
+
+      <DeviceControlActionsMenu
+        anchorEl={controlMenu.anchorEl}
+        open={controlMenu.menuOpen}
+        onClose={controlMenu.closeMenu}
+        onRestart={handleRestart}
+        onReset={handleReset}
+        onUpdate={handleUpdate}
+      />
 
       <DataGridRowActionsMenu
         anchorEl={rowMenu.anchorEl}
