@@ -64,7 +64,35 @@
     "noData": "등록된 장치가 없습니다.",
     "notFound": "장치를 찾을 수 없습니다.",
     "backToList": "목록으로",
-    "deleteConfirm": "이 장치를 삭제하시겠습니까?"
+    "deleteConfirm": "이 장치를 삭제하시겠습니까?",
+    "rowMenuSettings": "설정",
+    "settingsTitle": "장치 설정 (#{{id}})",
+    "settingsSaveSection": "이 섹션 저장",
+    "settingsEditDevice": "장치 정보 수정",
+    "settings": {
+      "nav": {
+        "identification": "인증 모드",
+        "wiegand": "위겐드",
+        "osdp": "OSDP",
+        "hid": "HID",
+        "display": "디스플레이",
+        "identificationMethods": "인증 수단",
+        "facial": "안면",
+        "attendance": "근태",
+        "accessDisplay": "출입 표시"
+      },
+      "sections": {
+        "identification": "인증 모드 설정",
+        "wiegand": "위겐드 설정",
+        "osdp": "OSDP 설정",
+        "hid": "HID 설정",
+        "display": "디스플레이 설정",
+        "identificationMethods": "인증 수단 설정",
+        "facial": "안면 설정",
+        "attendance": "근태 모드 설정",
+        "accessDisplay": "이름 표시 설정"
+      }
+    }
   },
   "apiErrors": {
     "AUTH_INVALID_CREDENTIALS": "아이디 또는 비밀번호가 올바르지 않습니다.",

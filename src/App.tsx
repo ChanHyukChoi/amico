@@ -1,4 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  DeviceSettingsIdentificationSection,
+  DeviceSettingsWiegandSection,
+  DeviceSettingsOsdpSection,
+  DeviceSettingsHidSection,
+  DeviceSettingsDisplaySection,
+  DeviceSettingsIdentificationMethodsSection,
+  DeviceSettingsFacialSection,
+  DeviceSettingsAttendanceSection,
+  DeviceSettingsAccessDisplaySection,
+} from "@/components/Devices/settings/sections/DeviceSettingsSectionPlaceholders";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -38,9 +49,35 @@ function App() {
               <Route path="users/new" element={<UsersPage />} />
               <Route path="users/:id" element={<UsersPage />} />
               <Route path="access-log" element={<AccessLogPage />} />
-              <Route path="departments" element={<DepartmentsPage />} />
               <Route path="devices" element={<DevicesPage />} />
               <Route path="devices/new" element={<DevicesPage />} />
+              <Route path="devices/:id/settings" element={<DevicesPage />}>
+                <Route
+                  index
+                  element={<Navigate to="identification" replace relative="path" />}
+                />
+                <Route
+                  path="identification"
+                  element={<DeviceSettingsIdentificationSection />}
+                />
+                <Route path="wiegand" element={<DeviceSettingsWiegandSection />} />
+                <Route path="osdp" element={<DeviceSettingsOsdpSection />} />
+                <Route path="hid" element={<DeviceSettingsHidSection />} />
+                <Route path="display" element={<DeviceSettingsDisplaySection />} />
+                <Route
+                  path="identification-methods"
+                  element={<DeviceSettingsIdentificationMethodsSection />}
+                />
+                <Route path="facial" element={<DeviceSettingsFacialSection />} />
+                <Route
+                  path="attendance"
+                  element={<DeviceSettingsAttendanceSection />}
+                />
+                <Route
+                  path="access-display"
+                  element={<DeviceSettingsAccessDisplaySection />}
+                />
+              </Route>
               <Route path="devices/:id" element={<DevicesPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

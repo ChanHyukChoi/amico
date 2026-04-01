@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Menu, MenuItem } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
@@ -8,6 +9,8 @@ type DataGridRowActionsMenuProps = {
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  /** 수정·삭제 아래에만 렌더 (예: 장치 목록의 설정 메뉴) */
+  extra?: ReactNode;
 };
 
 /** 목록 그리드 행 액션(수정/삭제) 공통 메뉴 */
@@ -17,6 +20,7 @@ export function DataGridRowActionsMenu({
   onClose,
   onEdit,
   onDelete,
+  extra,
 }: DataGridRowActionsMenuProps) {
   const { t } = useTranslation();
 
@@ -36,6 +40,7 @@ export function DataGridRowActionsMenu({
         <Delete fontSize="small" sx={{ mr: 1 }} />
         {t("common.delete")}
       </MenuItem>
+      {extra}
     </Menu>
   );
 }

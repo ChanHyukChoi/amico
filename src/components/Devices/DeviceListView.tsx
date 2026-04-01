@@ -8,7 +8,8 @@ import {
   type GridColDef,
   type GridRenderCellParams,
 } from "@mui/x-data-grid";
-import { Button, TextField, Box, type Theme } from "@mui/material";
+import { Button, TextField, Box, type Theme, IconButton, MenuItem } from "@mui/material";
+import { MoreVert, Settings } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import { fetchDevices, deleteDevice } from "@/api/devices";
 import type { Device } from "@/types/device";
@@ -66,6 +67,13 @@ export default function DeviceListView() {
     }
   };
 
+  const handleSettings = () => {
+    if (rowMenu.selectedRow) {
+      navigate(`/devices/${rowMenu.selectedRow.id}/settings`);
+    }
+    rowMenu.closeMenu();
+  };
+
   const columns = useMemo<GridColDef<Device>[]>(
     () => [
       {
@@ -113,6 +121,21 @@ export default function DeviceListView() {
         headerName: t("devices.isActive"),
         flex: 0.8,
         minWidth: 100,
+      },
+      {
+        field: "actions",
+        headerName: t("devices.actions"),
+        width: 56,
+        sortable: false,
+        filterable: false,
+        renderCell: (params: GridRenderCellParams<Device>) => (
+          <IconButton
+            size="small"
+            onClick={(e) => rowMenu.openMenu(e, params.row)}
+          >
+            <MoreVert fontSize="small" />
+          </IconButton>
+        ),
       },
     ],
     [t, navigate, rowMenu.openMenu],
@@ -193,6 +216,12 @@ export default function DeviceListView() {
         onClose={rowMenu.closeMenu}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        extra={
+          <MenuItem onClick={handleSettings}>
+            <Settings fontSize="small" sx={{ mr: 1 }} />
+            {t("devices.rowMenuSettings")}
+          </MenuItem>
+        }
       />
     </Box>
   );

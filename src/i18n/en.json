@@ -64,7 +64,35 @@
     "noData": "No devices registered.",
     "notFound": "Device not found.",
     "backToList": "Back to list",
-    "deleteConfirm": "Are you sure you want to delete this device?"
+    "deleteConfirm": "Are you sure you want to delete this device?",
+    "rowMenuSettings": "Settings",
+    "settingsTitle": "Device settings (#{{id}})",
+    "settingsSaveSection": "Save this section",
+    "settingsEditDevice": "Edit device info",
+    "settings": {
+      "nav": {
+        "identification": "Identification mode",
+        "wiegand": "Wiegand",
+        "osdp": "OSDP",
+        "hid": "HID",
+        "display": "Display",
+        "identificationMethods": "Identification methods",
+        "facial": "Facial",
+        "attendance": "Attendance",
+        "accessDisplay": "Access display"
+      },
+      "sections": {
+        "identification": "Identification mode",
+        "wiegand": "Wiegand",
+        "osdp": "OSDP",
+        "hid": "HID",
+        "display": "Display",
+        "identificationMethods": "Identification methods",
+        "facial": "Facial",
+        "attendance": "Attendance mode",
+        "accessDisplay": "Name on access"
+      }
+    }
   },
   "apiErrors": {
     "AUTH_INVALID_CREDENTIALS": "Invalid username or password.",
