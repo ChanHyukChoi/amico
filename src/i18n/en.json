@@ -68,6 +68,7 @@
     "backToList": "Back to list",
     "deleteConfirm": "Are you sure you want to delete this device?",
     "rowMenuSettings": "Settings",
+    "controlsConnect": "Connect",
     "controlsRestart": "Restart",
     "controlsReset": "Reset",
     "controlsUpdate": "Update",
@@ -99,17 +100,39 @@
       }
     }
   },
+  "accessLog": {
+    "list": "Access log",
+    "dateFrom": "Start date",
+    "dateTo": "End date",
+    "search": "Search",
+    "defaultRangeHint": "Leave both dates empty to use the server default (last 30 days).",
+    "noData": "No access logs in this range.",
+    "time": "Time",
+    "event": "Event",
+    "deviceId": "Device",
+    "userId": "User",
+    "identifierId": "Identifier"
+  },
   "apiErrors": {
     "AUTH_INVALID_CREDENTIALS": "Invalid username or password.",
     "AUTH_TOKEN_INVALID": "Your session expired or the token is invalid. Please sign in again.",
+    "AUTH_SESSION_REPLACED": "You have been signed out because another device signed in with your account.",
     "USER_INVALID_ID": "Invalid user identifier.",
     "USER_NOT_FOUND": "User not found.",
     "USER_VALIDATION_REQUIRED": "Required fields are missing.",
     "USER_ID_DUPLICATE": "This login ID is already in use.",
     "ACCESS_LOG_NOT_FOUND": "Access log not found.",
+    "ACCESS_LOG_INVALID_ID": "Invalid access log identifier.",
+    "ACCESS_LOG_INVALID_TIME_RANGE": "Invalid access log time range.",
+    "ACCESS_LOG_INVALID_EVENT": "Invalid access log event.",
     "UNKNOWN": "An unknown error occurred.",
     "httpDetail": " (HTTP {{status}})",
     "CLIENT_NETWORK_ERROR": "Cannot reach the server."
+  },
+  "session": {
+    "expiredTitle": "Session Ended",
+    "expiredMessage": "You have been signed out because another device signed in with your account. Please sign in again.",
+    "confirm": "Go to Login"
   },
   "layout": {
     "logout": "Log out",

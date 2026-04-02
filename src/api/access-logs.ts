@@ -15,6 +15,9 @@ export async function fetchAccessLogs(
     searchParams.set("userId", String(params.userId));
   if (params?.deviceId != null)
     searchParams.set("deviceId", String(params.deviceId));
+  if (params?.page != null) searchParams.set("page", String(params.page));
+  if (params?.pageSize != null)
+    searchParams.set("pageSize", String(params.pageSize));
   const query = searchParams.toString();
   const path = query
     ? `/api/hid/access-logs?${query}`
@@ -22,10 +25,11 @@ export async function fetchAccessLogs(
   return requestEnvelope<PaginatedResponse<AccessLog>>(path);
 }
 
+/** 성공 시 서버는 `{ success: true, data: null }` */
 export async function deleteAccessLog(
   id: number,
-): Promise<ApiResponse<void>> {
-  return requestEnvelope<void>(`/api/hid/access-logs/${id}`, {
+): Promise<ApiResponse<null>> {
+  return requestEnvelope<null>(`/api/hid/access-logs/${id}`, {
     method: "DELETE",
   });
 }

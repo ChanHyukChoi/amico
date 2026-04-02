@@ -30,13 +30,14 @@ export interface AccessLog {
   card_value?: number;
   confidence?: number; // 0 ~ 1800
   mask?: 0 | 1;
-  log_type_id?: number;
 }
 
-/** 접근 로그 조회 파라미터 */
+/** 접근 로그 조회 파라미터 — start/end 둘 다 없으면 서버가 최근 30일(hid-amico-server 계약) */
 export interface AccessLogListParams {
-  startTime?: number; // Unix Timestamp (필수)
-  endTime?: number; // Unix Timestamp (필수)
+  startTime?: number; // Unix Timestamp (초)
+  endTime?: number; // Unix Timestamp (초)
+  page?: number;
+  pageSize?: number;
   event?: AccessEvent; // 선택: 특정 이벤트만
   userId?: number; // 선택: 특정 유저만
   deviceId?: number; // 선택: 특정 리더기만

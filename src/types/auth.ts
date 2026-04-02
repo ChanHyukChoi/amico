@@ -4,7 +4,7 @@ export interface LoginRequest {
   password: string;
 }
 
-/** 로그인 성공 응답 - ASP.NET 백엔드: { "token": "..." } */
+/** 로그인 성공 시 클라이언트에 보관되는 토큰 (응답은 token / accessToken / data 래핑 등 지원) */
 export interface LoginResponse {
   token: string;
 }

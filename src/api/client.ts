@@ -35,7 +35,9 @@ export function apply401AuthPolicy(path: string, code: string): void {
   if (path === AUTH_LOGIN_PATH && code === API_ERROR_CODES.AUTH_INVALID_CREDENTIALS) {
     return;
   }
-  useAuthStore.getState().clearAuth();
+  const reason =
+    code === API_ERROR_CODES.AUTH_SESSION_REPLACED ? "SESSION_REPLACED" : null;
+  useAuthStore.getState().clearAuth(reason);
 }
 
 export async function transportFetch(
@@ -54,8 +56,8 @@ export async function transportFetch(
   }
 
   if (import.meta.env.DEV) {
-    // 최소 로그: 요청/응답 라인만
-    console.log("[API] ->", method, url);
+    // 최소 로그: 요청/응답 라인만 (401 디버깅 시 Authorization 전달 여부 확인)
+    console.log("[API] ->", method, url, token ? "[auth:yes]" : "[auth:no]");
   }
 
   const res = await fetch(url, {
@@ -107,8 +109,21 @@ export async function requestEnvelope<T>(
   const status = res.status;
 
   if (status === 401) {
+    const parsedCode = parseApiErrorCodeFromText(text);
+    if (import.meta.env.DEV || import.meta.env.VITE_API_DEBUG === "true") {
+      const preview = text.replace(/\s+/g, " ").trim().slice(0, 400);
+      console.warn(`[API] 401 ${path}`, {
+        bodyPreview: preview || "(empty)",
+        parsedApiCode: parsedCode ?? "(not in { success:false, code } shape)",
+        effectiveCode:
+          parsedCode ??
+          (path === AUTH_LOGIN_PATH
+            ? API_ERROR_CODES.AUTH_INVALID_CREDENTIALS
+            : API_ERROR_CODES.AUTH_TOKEN_INVALID),
+      });
+    }
     const code =
-      parseApiErrorCodeFromText(text) ??
+      parsedCode ??
       (path === AUTH_LOGIN_PATH
         ? API_ERROR_CODES.AUTH_INVALID_CREDENTIALS
         : API_ERROR_CODES.AUTH_TOKEN_INVALID);

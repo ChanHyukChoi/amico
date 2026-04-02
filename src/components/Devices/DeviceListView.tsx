@@ -18,7 +18,8 @@ import {
 } from "@mui/material";
 import { MoreVert, Settings } from "@mui/icons-material";
 import { useMemo, useState } from "react";
-import { fetchDevices, deleteDevice } from "@/api/devices";
+import { fetchDevices, deleteDevice, connectDevice } from "@/api/devices";
+import { getApiErrorMessage } from "@/api/apiErrorMessages";
 import type { Device } from "@/types/device";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
@@ -54,6 +55,15 @@ export default function DeviceListView() {
     },
   });
 
+  const connectMutation = useMutation({
+    mutationFn: connectDevice,
+    onSuccess: (res) => {
+      if (!res.success) {
+        window.alert(getApiErrorMessage(t, res.code, res.status));
+      }
+    },
+  });
+
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setAppliedSearch(searchValue.trim());
@@ -82,6 +92,13 @@ export default function DeviceListView() {
       navigate(`/devices/${rowMenu.selectedRow.id}/settings`);
     }
     rowMenu.closeMenu();
+  };
+
+  const handleConnect = () => {
+    if (controlMenu.selectedRow) {
+      connectMutation.mutate(controlMenu.selectedRow.id);
+    }
+    controlMenu.closeMenu();
   };
 
   const handleRestart = () => {
@@ -262,6 +279,7 @@ export default function DeviceListView() {
         anchorEl={controlMenu.anchorEl}
         open={controlMenu.menuOpen}
         onClose={controlMenu.closeMenu}
+        onConnect={handleConnect}
         onRestart={handleRestart}
         onReset={handleReset}
         onUpdate={handleUpdate}

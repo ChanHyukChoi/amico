@@ -46,3 +46,10 @@ export async function updateDevice(
 export async function deleteDevice(id: number): Promise<ApiResponse<void>> {
   return requestEnvelope<void>(`/api/devices/${id}`, { method: "DELETE" });
 }
+
+/** AMICO 세션: POST /api/devices/{id}/connect (Bearer는 client에서 자동) */
+export async function connectDevice(id: number): Promise<ApiResponse<null>> {
+  return requestEnvelope<null>(`/api/devices/${id}/connect`, {
+    method: "POST",
+  });
+}

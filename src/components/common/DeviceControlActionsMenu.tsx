@@ -1,11 +1,12 @@
 import { Menu, MenuItem } from "@mui/material";
-import { RestartAlt, Update } from "@mui/icons-material";
+import { Link as LinkIcon, RestartAlt, Update } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
 type DeviceControlActionsMenuProps = {
   anchorEl: HTMLElement | null;
   open: boolean;
   onClose: () => void;
+  onConnect: () => void;
   onRestart: () => void;
   onReset: () => void;
   onUpdate: () => void;
@@ -15,6 +16,7 @@ export function DeviceControlActionsMenu({
   anchorEl,
   open,
   onClose,
+  onConnect,
   onRestart,
   onReset,
   onUpdate,
@@ -29,6 +31,10 @@ export function DeviceControlActionsMenu({
       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "right" }}
     >
+      <MenuItem onClick={onConnect}>
+        <LinkIcon fontSize="small" sx={{ mr: 1 }} />
+        {t("devices.controlsConnect")}
+      </MenuItem>
       <MenuItem onClick={onRestart}>
         <RestartAlt fontSize="small" sx={{ mr: 1 }} />
         {t("devices.controlsRestart")}
