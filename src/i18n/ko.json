@@ -45,7 +45,11 @@
     "invalidEmail": "올바른 이메일 형식이 아닙니다.",
     "passwordMismatch": "비밀번호가 일치하지 않습니다.",
     "passwordChangeOptional": "변경 시에만 입력",
-    "userIdExists": "이미 사용 중인 로그인 ID입니다."
+    "userIdExists": "이미 사용 중인 로그인 ID입니다.",
+    "expandDetails": "행 상세 펼치기",
+    "collapseDetails": "행 상세 접기",
+    "createdAt": "등록일",
+    "updatedAt": "수정일"
   },
   "devices": {
     "list": "장치 목록",

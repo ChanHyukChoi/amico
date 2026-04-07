@@ -45,7 +45,11 @@
     "invalidEmail": "Invalid email format.",
     "passwordMismatch": "Passwords do not match.",
     "passwordChangeOptional": "Leave blank to keep current",
-    "userIdExists": "This login ID is already in use."
+    "userIdExists": "This login ID is already in use.",
+    "expandDetails": "Expand row details",
+    "collapseDetails": "Collapse row details",
+    "createdAt": "Created",
+    "updatedAt": "Updated"
   },
   "devices": {
     "list": "Device list",

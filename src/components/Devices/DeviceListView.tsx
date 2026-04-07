@@ -29,7 +29,16 @@ import { DeviceControlActionsMenu } from "@/components/common/DeviceControlActio
 import { getDeviceModelLabel } from "@/constants/deviceModelOptions";
 
 //#endregion
-export default function DeviceListView() {
+
+type DeviceListViewProps = {
+  onAddDevice: () => void;
+  onEditDevice: (deviceId: number) => void;
+};
+
+export default function DeviceListView({
+  onAddDevice,
+  onEditDevice,
+}: DeviceListViewProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -75,7 +84,7 @@ export default function DeviceListView() {
   const pageSize = 10;
 
   const handleEdit = () => {
-    if (rowMenu.selectedRow) navigate(`/devices/${rowMenu.selectedRow.id}`);
+    if (rowMenu.selectedRow) onEditDevice(rowMenu.selectedRow.id);
     rowMenu.closeMenu();
   };
 
@@ -134,7 +143,7 @@ export default function DeviceListView() {
             variant="text"
             size="small"
             sx={{ textTransform: "none", fontWeight: 600 }}
-            onClick={() => navigate(`/devices/${params.row.id}`)}
+            onClick={() => onEditDevice(params.row.id)}
           >
             {params.value}
           </Button>
@@ -203,7 +212,7 @@ export default function DeviceListView() {
         ),
       },
     ],
-    [t, navigate, rowMenu.openMenu, controlMenu.openMenu],
+    [t, navigate, onEditDevice, rowMenu.openMenu, controlMenu.openMenu],
   );
 
   return (
@@ -219,7 +228,7 @@ export default function DeviceListView() {
       <ListPageHeader
         title={t("devices.list")}
         actionLabel={t("devices.addDevice")}
-        onAction={() => navigate("/devices/new")}
+        onAction={onAddDevice}
       />
 
       <Box

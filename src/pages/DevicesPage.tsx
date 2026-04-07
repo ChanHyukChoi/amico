@@ -1,4 +1,6 @@
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
 import DeviceListView from "@/components/Devices/DeviceListView";
 import DeviceFormView from "@/components/Devices/DeviceFormView";
 import DeviceSettingsLayout from "@/components/Devices/settings/DeviceSettingsLayout";
@@ -6,16 +8,49 @@ import DeviceSettingsLayout from "@/components/Devices/settings/DeviceSettingsLa
 export function DevicesPage() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const pathname = location.pathname;
+  const isSettings = pathname.includes("/settings");
 
-  if (pathname.endsWith("/new")) {
-    return <DeviceFormView mode="create" />;
-  }
-  if (id && pathname.includes("/settings")) {
+  if (id && isSettings) {
     return <DeviceSettingsLayout />;
   }
-  if (id) {
-    return <DeviceFormView mode="edit" />;
-  }
-  return <DeviceListView />;
+
+  const isNew = pathname.endsWith("/new");
+  const isEdit = Boolean(id);
+  const formOpen = isNew || isEdit;
+
+  const closeForm = () => {
+    navigate("/devices");
+  };
+
+  return (
+    <>
+      <DeviceListView
+        onAddDevice={() => navigate("/devices/new")}
+        onEditDevice={(deviceId) => navigate(`/devices/${deviceId}`)}
+      />
+      {formOpen ? (
+        <Dialog
+          open
+          onClose={(_, reason) => {
+            if (reason === "backdropClick" || reason === "escapeKeyDown") {
+              return;
+            }
+          }}
+          maxWidth="sm"
+          fullWidth
+          scroll="paper"
+        >
+          <DialogContent>
+            <DeviceFormView
+              key={isNew ? "create" : id}
+              mode={isNew ? "create" : "edit"}
+              onRequestClose={closeForm}
+            />
+          </DialogContent>
+        </Dialog>
+      ) : null}
+    </>
+  );
 }

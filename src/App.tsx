@@ -21,7 +21,6 @@ import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { UsersPage } from "@/pages/UsersPage";
 import { AccessLogPage } from "@/pages/AccessLogPage";
-import { DepartmentsPage } from "@/pages/DepartmentsPage";
 import { DevicesPage } from "@/pages/DevicesPage";
 
 const queryClient = new QueryClient();

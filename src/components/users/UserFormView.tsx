@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,9 +48,14 @@ type CreateUserFormValues = z.infer<typeof createUserFormSchema>;
 type EditUserFormValues = z.infer<typeof editUserFormSchema>;
 type UserFormValues = CreateUserFormValues | EditUserFormValues;
 
-export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
+export default function UserFormView({
+  mode,
+  onRequestClose,
+}: {
+  mode: "create" | "edit";
+  onRequestClose: () => void;
+}) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
 
@@ -75,10 +80,8 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
         }
         return;
       }
-      if (res.data) {
-        queryClient.invalidateQueries({ queryKey: ["users"] });
-        navigate("/users");
-      }
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      onRequestClose();
     },
     onError: (err: Error) => {
       setError("root", { message: err.message || "저장에 실패했습니다." });
@@ -102,7 +105,7 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
       }
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["user", Number(id)] });
-      navigate("/users");
+      onRequestClose();
     },
     onError: (err: Error) => {
       setError("root", { message: err.message || "수정에 실패했습니다." });
@@ -184,7 +187,7 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
         <Button
           variant="text"
           sx={{ mt: 2, p: 0, minHeight: "auto" }}
-          onClick={() => navigate("/users")}
+          onClick={onRequestClose}
         >
           {t("users.backToList")}
         </Button>
@@ -192,8 +195,9 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
     );
   }
 
+  //return
   return (
-    <Box sx={{ maxWidth: 448 }}>
+    <Box sx={{ width: "100%", maxWidth: 500 }}>
       <Stack component="form" onSubmit={handleSubmit(onSubmit)} spacing={2}>
         <h1 style={{ fontSize: "1.5rem", fontWeight: 600 }}>
           {mode === "create" ? t("users.addUser") : t("users.editUser")}
@@ -299,11 +303,7 @@ export default function UserFormView({ mode }: { mode: "create" | "edit" }) {
               ? t("common.loading")
               : t("common.save")}
           </Button>
-          <Button
-            type="button"
-            variant="outlined"
-            onClick={() => navigate("/users")}
-          >
+          <Button type="button" variant="outlined" onClick={onRequestClose}>
             {t("common.cancel")}
           </Button>
         </Stack>

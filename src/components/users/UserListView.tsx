@@ -1,14 +1,24 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import {
   DataGrid,
   type GridColDef,
   type GridRenderCellParams,
+  type GridSortModel,
 } from "@mui/x-data-grid";
-import { IconButton, Button, TextField, Box, type Theme } from "@mui/material";
-import { MoreVert } from "@mui/icons-material";
-import { useMemo, useState } from "react";
+import {
+  IconButton,
+  Button,
+  TextField,
+  Box,
+  Stack,
+  Typography,
+  type Theme,
+} from "@mui/material";
+import { ChevronRight, ExpandMore, MoreVert } from "@mui/icons-material";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { format } from "date-fns";
+import { ko as dateFnsKo, enUS as dateFnsEn } from "date-fns/locale";
 import { fetchUsers, deleteUser } from "@/api/users";
 import type { User } from "@/types/user";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
@@ -16,16 +26,100 @@ import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
 
-export default function UserListView() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+const USER_GRID_COLUMN_COUNT = 6;
+
+type UserDetailRow = {
+  id: string;
+  __isDetail: true;
+  parent: User;
+};
+
+type UserGridRow = User | UserDetailRow;
+
+function isUserDetailRow(row: UserGridRow): row is UserDetailRow {
+  return "__isDetail" in row && row.__isDetail === true;
+}
+
+function compareUsersByField(
+  a: User,
+  b: User,
+  field: string,
+  direction: "asc" | "desc",
+): number {
+  const dir = direction === "desc" ? -1 : 1;
+  switch (field) {
+    case "userId":
+      return (
+        dir *
+        String(a.userId).localeCompare(String(b.userId), undefined, {
+          numeric: true,
+          sensitivity: "base",
+        })
+      );
+    case "name":
+      return (
+        dir *
+        String(a.name).localeCompare(String(b.name), undefined, {
+          sensitivity: "base",
+        })
+      );
+    case "department":
+      return (
+        dir *
+        String(a.department ?? "").localeCompare(
+          String(b.department ?? ""),
+          undefined,
+          { sensitivity: "base" },
+        )
+      );
+    case "email":
+      return (
+        dir *
+        String(a.email ?? "").localeCompare(String(b.email ?? ""), undefined, {
+          sensitivity: "base",
+        })
+      );
+    default:
+      return 0;
+  }
+}
+
+function formatUserTimestamp(
+  iso: string | undefined,
+  language: string,
+): string {
+  if (!iso) return "-";
+  try {
+    const locale = language.startsWith("ko") ? dateFnsKo : dateFnsEn;
+    return format(new Date(iso), "yyyy-MM-dd HH:mm", { locale });
+  } catch {
+    return iso;
+  }
+}
+
+type UserListViewProps = {
+  onAddUser: () => void;
+  onEditUser: (userId: number) => void;
+};
+
+export default function UserListView({
+  onAddUser,
+  onEditUser,
+}: UserListViewProps) {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
-  const { page, setPage, onPaginationModelChange } = useServerPaginationPage(
-    1,
-  );
+  const { page, setPage, onPaginationModelChange } = useServerPaginationPage(1);
   const [appliedSearch, setAppliedSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [expandedUserIds, setExpandedUserIds] = useState<Set<number>>(
+    () => new Set(),
+  );
+  const [sortModel, setSortModel] = useState<GridSortModel>([]);
   const rowMenu = useRowActionMenu<User>();
+
+  useEffect(() => {
+    setExpandedUserIds(new Set());
+  }, [page, appliedSearch]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["users", page, appliedSearch],
@@ -53,8 +147,40 @@ export default function UserListView() {
   const items = data?.success && data.data ? data.data.items : [];
   const pageSize = 10;
 
+  const sortedItems = useMemo(() => {
+    const first = sortModel[0];
+    if (!first?.sort || !first.field) return items;
+    return [...items].sort((a, b) =>
+      compareUsersByField(a, b, first.field, first.sort as "asc" | "desc"),
+    );
+  }, [items, sortModel]);
+
+  const gridRows = useMemo((): UserGridRow[] => {
+    const out: UserGridRow[] = [];
+    for (const u of sortedItems) {
+      out.push(u);
+      if (expandedUserIds.has(u.id)) {
+        out.push({
+          id: `detail-${u.id}`,
+          __isDetail: true,
+          parent: u,
+        });
+      }
+    }
+    return out;
+  }, [sortedItems, expandedUserIds]);
+
+  const toggleUserExpanded = useCallback((userId: number) => {
+    setExpandedUserIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(userId)) next.delete(userId);
+      else next.add(userId);
+      return next;
+    });
+  }, []);
+
   const handleEdit = () => {
-    if (rowMenu.selectedRow) navigate(`/users/${rowMenu.selectedRow.id}`);
+    if (rowMenu.selectedRow) onEditUser(rowMenu.selectedRow.id);
     rowMenu.closeMenu();
   };
 
@@ -66,43 +192,104 @@ export default function UserListView() {
     }
   };
 
-  const columns = useMemo<GridColDef<User>[]>(
+  const columns = useMemo<GridColDef<UserGridRow>[]>(
     () => [
+      {
+        field: "expandToggle",
+        headerName: "",
+        width: 52,
+        minWidth: 52,
+        maxWidth: 52,
+        sortable: false,
+        filterable: false,
+        disableColumnMenu: true,
+        align: "center",
+        display: "flex",
+        valueGetter: () => null,
+        colSpan: (_value, row) =>
+          isUserDetailRow(row) ? USER_GRID_COLUMN_COUNT : 1,
+        renderCell: (params: GridRenderCellParams<UserGridRow>) => {
+          if (isUserDetailRow(params.row)) {
+            return (
+              <Box
+                component="div"
+                sx={{
+                  width: "100%",
+                  py: 1.5,
+                  boxSizing: "border-box",
+                  borderTop: 1,
+                  borderColor: "divider",
+                  bgcolor: "primary.light",
+                }}
+              ></Box>
+            );
+          }
+          const user = params.row;
+          const open = expandedUserIds.has(user.id);
+          return (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleUserExpanded(user.id);
+              }}
+              aria-label={
+                open ? t("users.collapseDetails") : t("users.expandDetails")
+              }
+              aria-expanded={open}
+            >
+              {open ? (
+                <ExpandMore fontSize="small" />
+              ) : (
+                <ChevronRight fontSize="small" />
+              )}
+            </IconButton>
+          );
+        },
+      },
       {
         field: "userId",
         headerName: t("users.userId"),
         flex: 0.8,
         minWidth: 100,
+        valueGetter: (value, row) =>
+          isUserDetailRow(row) ? "" : (value ?? row.userId),
       },
       {
         field: "name",
         headerName: t("users.name"),
         flex: 1,
         minWidth: 120,
-        renderCell: (params: GridRenderCellParams<User>) => (
-          <Button
-            variant="text"
-            size="small"
-            sx={{ textTransform: "none", fontWeight: 600 }}
-            onClick={() => navigate(`/users/${params.row.id}`)}
-          >
-            {params.value}
-          </Button>
-        ),
+        renderCell: (params: GridRenderCellParams<UserGridRow>) => {
+          const row = params.row;
+          if (isUserDetailRow(row)) return null;
+          return (
+            <Button
+              variant="text"
+              size="small"
+              sx={{ textTransform: "none", fontWeight: 600 }}
+              onClick={() => onEditUser(row.id)}
+            >
+              {row.name}
+            </Button>
+          );
+        },
       },
       {
         field: "department",
         headerName: t("users.department"),
         flex: 1,
         minWidth: 100,
-        valueGetter: (_, row) => row.department ?? "-",
+        valueGetter: (_, row) =>
+          isUserDetailRow(row) ? "" : (row.department ?? "-"),
       },
       {
         field: "email",
         headerName: t("users.email"),
         flex: 1.2,
         minWidth: 160,
-        valueGetter: (_, row) => row.email ?? "-",
+        valueGetter: (_, row) =>
+          isUserDetailRow(row) ? "" : (row.email ?? "-"),
       },
       {
         field: "actions",
@@ -110,18 +297,29 @@ export default function UserListView() {
         width: 56,
         sortable: false,
         filterable: false,
-        renderCell: (params: GridRenderCellParams<User>) => (
-          <IconButton
-            size="small"
-            onClick={(e) => rowMenu.openMenu(e, params.row)}
-            aria-label={t("users.actions")}
-          >
-            <MoreVert fontSize="small" />
-          </IconButton>
-        ),
+        renderCell: (params: GridRenderCellParams<UserGridRow>) => {
+          const row = params.row;
+          if (isUserDetailRow(row)) return null;
+          return (
+            <IconButton
+              size="small"
+              onClick={(e) => rowMenu.openMenu(e, row)}
+              aria-label={t("users.actions")}
+            >
+              <MoreVert fontSize="small" />
+            </IconButton>
+          );
+        },
       },
     ],
-    [t, navigate, rowMenu.openMenu],
+    [
+      t,
+      i18n.language,
+      onEditUser,
+      rowMenu.openMenu,
+      expandedUserIds,
+      toggleUserExpanded,
+    ],
   );
 
   return (
@@ -137,7 +335,7 @@ export default function UserListView() {
       <ListPageHeader
         title={t("users.list")}
         actionLabel={t("users.addUser")}
-        onAction={() => navigate("/users/new")}
+        onAction={onAddUser}
       />
 
       <Box
@@ -164,10 +362,21 @@ export default function UserListView() {
       ) : (
         <Box sx={{ flex: 1, minHeight: 300, width: "100%" }}>
           <DataGrid
-            rows={items}
+            rows={gridRows}
             columns={columns}
             getRowId={(row) => row.id}
+            getRowClassName={(params) =>
+              isUserDetailRow(params.row as UserGridRow)
+                ? "user-list-detail-row"
+                : ""
+            }
+            getRowHeight={({ model }) =>
+              isUserDetailRow(model as UserGridRow) ? "auto" : 52
+            }
             paginationMode="server"
+            sortingMode="server"
+            sortModel={sortModel}
+            onSortModelChange={setSortModel}
             rowCount={total}
             paginationModel={{
               page: page - 1,
@@ -182,6 +391,20 @@ export default function UserListView() {
             }}
             sx={{
               "& .MuiDataGrid-cell:focus": { outline: "none" },
+              /* 기본 셀의 text-overflow: ellipsis가 아이콘·인접 텍스트에 잘림/점(…) 조각으로 보이는 현상 방지 */
+              "& .MuiDataGrid-columnHeader[data-field='expandToggle']": {
+                px: 0,
+              },
+              "& .MuiDataGrid-row:not(.user-list-detail-row) .MuiDataGrid-cell[data-field='expandToggle']":
+                {
+                  px: 0,
+                  textOverflow: "clip",
+                  justifyContent: "center",
+                },
+              "& .user-list-detail-row .MuiDataGrid-cell": {
+                borderBottomColor: "transparent",
+                px: 0,
+              },
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: (theme: Theme) =>
                   theme.palette.mode === "light"

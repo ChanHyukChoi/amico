@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,9 +52,14 @@ type CreateDeviceFormValues = z.infer<typeof createDeviceFormSchema>;
 type EditDeviceFormValues = z.infer<typeof editDeviceFormSchema>;
 type DeviceFormValues = CreateDeviceFormValues | EditDeviceFormValues;
 
-export default function DeviceFormView({ mode }: { mode: "create" | "edit" }) {
+export default function DeviceFormView({
+  mode,
+  onRequestClose,
+}: {
+  mode: "create" | "edit";
+  onRequestClose: () => void;
+}) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
 
@@ -80,7 +85,7 @@ export default function DeviceFormView({ mode }: { mode: "create" | "edit" }) {
         return;
       }
       queryClient.invalidateQueries({ queryKey: ["devices"] });
-      navigate("/devices");
+      onRequestClose();
     },
     onError: (err: Error) => {
       setError("root", { message: err.message || "저장에 실패했습니다." });
@@ -103,7 +108,7 @@ export default function DeviceFormView({ mode }: { mode: "create" | "edit" }) {
       }
       queryClient.invalidateQueries({ queryKey: ["devices"] });
       queryClient.invalidateQueries({ queryKey: ["device", Number(id)] });
-      navigate("/devices");
+      onRequestClose();
     },
     onError: (err: Error) => {
       setError("root", { message: err.message || "수정에 실패했습니다." });
@@ -190,7 +195,7 @@ export default function DeviceFormView({ mode }: { mode: "create" | "edit" }) {
         <Button
           variant="text"
           sx={{ mt: 2, p: 0, minHeight: "auto" }}
-          onClick={() => navigate("/devices")}
+          onClick={onRequestClose}
         >
           {t("devices.backToList")}
         </Button>
@@ -314,7 +319,7 @@ export default function DeviceFormView({ mode }: { mode: "create" | "edit" }) {
           <Button
             type="button"
             variant="outlined"
-            onClick={() => navigate("/devices")}
+            onClick={onRequestClose}
           >
             {t("common.cancel")}
           </Button>

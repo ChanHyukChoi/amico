@@ -12,11 +12,16 @@ export type DeviceModelOption = {
  * - label: 기본 표시 텍스트(번역 키가 없을 때 fallback)
  * - i18nKey: 번역 키가 있으면 이 값을 우선 표시
  */
+export const DEVICE_VENDOR_OPTIONS: DeviceModelOption[] = [
+  { value: "0", label: "0", i18nKey: "common.selectNone" },
+  { value: "1", label: "HID AMICO" },
+];
+
 export const DEVICE_MODEL_OPTIONS: DeviceModelOption[] = [
   { value: "0", label: "0", i18nKey: "common.selectNone" },
   // TODO: 아래에 모델 코드를 직접 추가하세요.
   { value: "1", label: "HID AMICO VL35LF" },
-  // { value: "2", label: "2" },
+  { value: "2", label: "HID AMICO VL70LF" },
 ];
 
 export function getDeviceModelLabel(value: string, t: TFunction): string {
