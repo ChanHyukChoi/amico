@@ -12,15 +12,22 @@ import {
   Button,
   TextField,
   Box,
-  type Theme,
   IconButton,
   MenuItem,
+  type Theme,
+  Stack,
 } from "@mui/material";
-import { MoreVert, Settings } from "@mui/icons-material";
-import { useMemo, useState } from "react";
+import {
+  ChevronRight,
+  ExpandMore,
+  MoreVert,
+  Settings,
+} from "@mui/icons-material";
+import { useMemo, useState, useEffect, useCallback } from "react";
+import { format } from "date-fns";
 import { fetchDevices, deleteDevice, connectDevice } from "@/api/devices";
 import { getApiErrorMessage } from "@/api/apiErrorMessages";
-import type { Device } from "@/types/device";
+import type { Device, DeviceDetailRow } from "@/types/device";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
@@ -29,6 +36,14 @@ import { DeviceControlActionsMenu } from "@/components/common/DeviceControlActio
 import { getDeviceModelLabel } from "@/constants/deviceModelOptions";
 
 //#endregion
+
+const DEVICE_GRID_COLUMN_COUNT = 9;
+
+type DeviceGridRow = Device | DeviceDetailRow;
+
+function isDeviceDetailRow(row: DeviceGridRow): row is DeviceDetailRow {
+  return "__isDetail" in row && row.__isDetail === true;
+}
 
 type DeviceListViewProps = {
   onAddDevice: () => void;
@@ -45,6 +60,9 @@ export default function DeviceListView({
   const { page, setPage, onPaginationModelChange } = useServerPaginationPage(1);
   const [appliedSearch, setAppliedSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [expandedDeviceIds, setExpandedDeviceIds] = useState<Set<number>>(
+    () => new Set(),
+  );
   const controlMenu = useRowActionMenu<Device>();
   const rowMenu = useRowActionMenu<Device>();
 
@@ -64,6 +82,10 @@ export default function DeviceListView({
     },
   });
 
+  useEffect(() => {
+    setExpandedDeviceIds(new Set());
+  }, [page, appliedSearch]);
+
   const connectMutation = useMutation({
     mutationFn: connectDevice,
     onSuccess: (res) => {
@@ -82,6 +104,30 @@ export default function DeviceListView({
   const total = data?.success && data.data ? data.data.total : 0;
   const items = data?.success && data.data ? data.data.items : [];
   const pageSize = 10;
+
+  const toggleDeviceExpanded = useCallback((deviceId: number) => {
+    setExpandedDeviceIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(deviceId)) next.delete(deviceId);
+      else next.add(deviceId);
+      return next;
+    });
+  }, []);
+
+  const gridRows = useMemo((): DeviceGridRow[] => {
+    const out: DeviceGridRow[] = [];
+    for (const d of items) {
+      out.push(d);
+      if (expandedDeviceIds.has(d.id)) {
+        out.push({
+          id: `detail-${d.id}`,
+          __isDetail: true,
+          parent: d,
+        });
+      }
+    }
+    return out;
+  }, [items, expandedDeviceIds]);
 
   const handleEdit = () => {
     if (rowMenu.selectedRow) onEditDevice(rowMenu.selectedRow.id);
@@ -131,55 +177,128 @@ export default function DeviceListView({
     controlMenu.closeMenu();
   };
 
-  const columns = useMemo<GridColDef<Device>[]>(
+  const columns = useMemo<GridColDef<DeviceGridRow>[]>(
     () => [
+      {
+        field: "toggleDetails",
+        headerName: "",
+        width: 52,
+        minWidth: 52,
+        maxWidth: 52,
+        sortable: false,
+        filterable: false,
+        disableColumnMenu: true,
+        align: "center",
+        display: "flex",
+        valueGetter: () => null,
+        colSpan: (_value, row) =>
+          isDeviceDetailRow(row) ? DEVICE_GRID_COLUMN_COUNT : 1,
+        renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
+          if (isDeviceDetailRow(params.row)) {
+            return (
+              <Box
+                component="div"
+                sx={{
+                  width: "100%",
+                  py: 1.5,
+                  boxSizing: "border-box",
+                  borderTop: 1,
+                  borderColor: "divider",
+                  bgcolor: "grey.200",
+                }}
+              >
+                <Stack direction="row" spacing={1}>
+                  <Button sx={{ bgcolor: "red" }}>a</Button>
+                  <Button sx={{ bgcolor: "blue" }}>b</Button>
+                </Stack>
+              </Box>
+            );
+          }
+          const device = params.row;
+          const open = expandedDeviceIds.has(device.id);
+          return (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleDeviceExpanded(device.id);
+              }}
+              aria-label={
+                open ? t("devices.collapseDetails") : t("devices.expandDetails")
+              }
+              aria-expanded={open}
+            >
+              {open ? (
+                <ExpandMore fontSize="small" />
+              ) : (
+                <ChevronRight fontSize="small" />
+              )}
+            </IconButton>
+          );
+        },
+      },
       {
         field: "description",
         headerName: t("devices.description"),
         flex: 1,
         minWidth: 120,
-        renderCell: (params: GridRenderCellParams<Device>) => (
-          <Button
-            variant="text"
-            size="small"
-            sx={{ textTransform: "none", fontWeight: 600 }}
-            onClick={() => onEditDevice(params.row.id)}
-          >
-            {params.value}
-          </Button>
-        ),
+        valueGetter: (value, row) =>
+          isDeviceDetailRow(row) ? "" : (value ?? row.description),
+        renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
+          const row = params.row;
+          if (isDeviceDetailRow(row)) return null;
+          return (
+            <Button
+              variant="text"
+              size="small"
+              sx={{ textTransform: "none", fontWeight: 600 }}
+              onClick={() => onEditDevice(row.id)}
+            >
+              {row.description}
+            </Button>
+          );
+        },
       },
       {
         field: "ip",
         headerName: t("devices.ip"),
         flex: 1,
         minWidth: 120,
+        valueGetter: (_, row) => (isDeviceDetailRow(row) ? "" : row.ip),
       },
       {
         field: "type",
         headerName: t("devices.type"),
         flex: 0.8,
         minWidth: 90,
+        valueGetter: (_, row) => (isDeviceDetailRow(row) ? "" : row.type),
       },
       {
         field: "model",
         headerName: t("devices.model"),
         flex: 1,
         minWidth: 100,
-        renderCell: (params: GridRenderCellParams<Device>) =>
-          getDeviceModelLabel(String(params.value ?? ""), t),
+        valueGetter: (_, row) =>
+          isDeviceDetailRow(row) ? "" : row.model,
+        renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
+          if (isDeviceDetailRow(params.row)) return null;
+          return getDeviceModelLabel(String(params.value ?? ""), t);
+        },
       },
       {
         field: "userId",
         headerName: t("devices.userId"),
         flex: 0.8,
         minWidth: 100,
+        valueGetter: (_, row) => (isDeviceDetailRow(row) ? "" : row.userId),
       },
       {
         field: "isActive",
         headerName: t("devices.isActive"),
         flex: 0.8,
         minWidth: 100,
+        valueGetter: (_, row) =>
+          isDeviceDetailRow(row) ? "" : String(row.isActive),
       },
       {
         field: "controls",
@@ -187,14 +306,17 @@ export default function DeviceListView({
         width: 56,
         sortable: false,
         filterable: false,
-        renderCell: (params: GridRenderCellParams<Device>) => (
-          <IconButton
-            size="small"
-            onClick={(e) => controlMenu.openMenu(e, params.row)}
-          >
-            <MoreVert fontSize="small" />
-          </IconButton>
-        ),
+        renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
+          if (isDeviceDetailRow(params.row)) return null;
+          return (
+            <IconButton
+              size="small"
+              onClick={(e) => controlMenu.openMenu(e, params.row)}
+            >
+              <MoreVert fontSize="small" />
+            </IconButton>
+          );
+        },
       },
       {
         field: "actions",
@@ -202,17 +324,28 @@ export default function DeviceListView({
         width: 56,
         sortable: false,
         filterable: false,
-        renderCell: (params: GridRenderCellParams<Device>) => (
-          <IconButton
-            size="small"
-            onClick={(e) => rowMenu.openMenu(e, params.row)}
-          >
-            <MoreVert fontSize="small" />
-          </IconButton>
-        ),
+        renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
+          if (isDeviceDetailRow(params.row)) return null;
+          return (
+            <IconButton
+              size="small"
+              onClick={(e) => rowMenu.openMenu(e, params.row)}
+            >
+              <MoreVert fontSize="small" />
+            </IconButton>
+          );
+        },
       },
     ],
-    [t, navigate, onEditDevice, rowMenu.openMenu, controlMenu.openMenu],
+    [
+      t,
+      navigate,
+      onEditDevice,
+      rowMenu.openMenu,
+      controlMenu.openMenu,
+      expandedDeviceIds,
+      toggleDeviceExpanded,
+    ],
   );
 
   return (
@@ -255,9 +388,17 @@ export default function DeviceListView({
       ) : (
         <Box sx={{ flex: 1, minHeight: 300, width: "100%" }}>
           <DataGrid
-            rows={items}
+            rows={gridRows}
             columns={columns}
             getRowId={(row) => row.id}
+            getRowClassName={(params) =>
+              isDeviceDetailRow(params.row as DeviceGridRow)
+                ? "device-list-detail-row"
+                : ""
+            }
+            getRowHeight={({ model }) =>
+              isDeviceDetailRow(model as DeviceGridRow) ? "auto" : 52
+            }
             paginationMode="server"
             rowCount={total}
             paginationModel={{
@@ -273,6 +414,19 @@ export default function DeviceListView({
             }}
             sx={{
               "& .MuiDataGrid-cell:focus": { outline: "none" },
+              "& .MuiDataGrid-columnHeader[data-field='toggleDetails']": {
+                px: 0,
+              },
+              "& .MuiDataGrid-row:not(.device-list-detail-row) .MuiDataGrid-cell[data-field='toggleDetails']":
+                {
+                  px: 0,
+                  textOverflow: "clip",
+                  justifyContent: "center",
+                },
+              "& .device-list-detail-row .MuiDataGrid-cell": {
+                borderBottomColor: "transparent",
+                px: 0,
+              },
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: (theme: Theme) =>
                   theme.palette.mode === "light"

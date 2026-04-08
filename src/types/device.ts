@@ -51,3 +51,9 @@ export interface UpdateDeviceRequest {
   settings?: Object;
   isActive?: boolean;
 }
+
+export type DeviceDetailRow = {
+  id: string;
+  __isDetail: true;
+  parent: Device;
+};

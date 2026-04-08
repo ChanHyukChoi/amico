@@ -12,7 +12,6 @@ import {
   TextField,
   Box,
   Stack,
-  Typography,
   type Theme,
 } from "@mui/material";
 import { ChevronRight, ExpandMore, MoreVert } from "@mui/icons-material";
@@ -20,19 +19,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { ko as dateFnsKo, enUS as dateFnsEn } from "date-fns/locale";
 import { fetchUsers, deleteUser } from "@/api/users";
-import type { User } from "@/types/user";
+import type { User, UserDetailRow } from "@/types/user";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
 
 const USER_GRID_COLUMN_COUNT = 6;
-
-type UserDetailRow = {
-  id: string;
-  __isDetail: true;
-  parent: User;
-};
 
 type UserGridRow = User | UserDetailRow;
 
@@ -195,7 +188,7 @@ export default function UserListView({
   const columns = useMemo<GridColDef<UserGridRow>[]>(
     () => [
       {
-        field: "expandToggle",
+        field: "toggleDetails",
         headerName: "",
         width: 52,
         minWidth: 52,
@@ -219,9 +212,14 @@ export default function UserListView({
                   boxSizing: "border-box",
                   borderTop: 1,
                   borderColor: "divider",
-                  bgcolor: "primary.light",
+                  bgcolor: "grey.200",
                 }}
-              ></Box>
+              >
+                <Stack direction="row" spacing={1}>
+                  <Button sx={{ bgcolor: "red" }}>a</Button>
+                  <Button sx={{ bgcolor: "blue" }}>b</Button>
+                </Stack>
+              </Box>
             );
           }
           const user = params.row;

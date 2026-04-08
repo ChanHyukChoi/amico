@@ -34,3 +34,9 @@ export interface UpdateUserRequest {
   department?: string;
   email?: string;
 }
+
+export type UserDetailRow = {
+  id: string;
+  __isDetail: true;
+  parent: User;
+};
