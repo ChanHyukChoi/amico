@@ -278,8 +278,7 @@ export default function DeviceListView({
         headerName: t("devices.model"),
         flex: 1,
         minWidth: 100,
-        valueGetter: (_, row) =>
-          isDeviceDetailRow(row) ? "" : row.model,
+        valueGetter: (_, row) => (isDeviceDetailRow(row) ? "" : row.model),
         renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
           if (isDeviceDetailRow(params.row)) return null;
           return getDeviceModelLabel(String(params.value ?? ""), t);
@@ -311,7 +310,7 @@ export default function DeviceListView({
           return (
             <IconButton
               size="small"
-              onClick={(e) => controlMenu.openMenu(e, params.row)}
+              onClick={(e) => controlMenu.openMenu(e, params.row as Device)}
             >
               <MoreVert fontSize="small" />
             </IconButton>
@@ -329,7 +328,7 @@ export default function DeviceListView({
           return (
             <IconButton
               size="small"
-              onClick={(e) => rowMenu.openMenu(e, params.row)}
+              onClick={(e) => rowMenu.openMenu(e, params.row as Device)}
             >
               <MoreVert fontSize="small" />
             </IconButton>
