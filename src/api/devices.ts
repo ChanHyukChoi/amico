@@ -47,9 +47,16 @@ export async function deleteDevice(id: number): Promise<ApiResponse<void>> {
   return requestEnvelope<void>(`/api/devices/${id}`, { method: "DELETE" });
 }
 
+export type DeviceConnectResponse = {
+  /** 장치 제어용 세션 문자열 (백엔드 응답 그대로 표시/보관) */
+  session: string;
+};
+
 /** AMICO 세션: POST /api/devices/{id}/connect (Bearer는 client에서 자동) */
-export async function connectDevice(id: number): Promise<ApiResponse<null>> {
-  return requestEnvelope<null>(`/api/devices/${id}/connect`, {
+export async function connectDevice(
+  id: number,
+): Promise<ApiResponse<DeviceConnectResponse>> {
+  return requestEnvelope<DeviceConnectResponse>(`/api/devices/${id}/connect`, {
     method: "POST",
   });
 }

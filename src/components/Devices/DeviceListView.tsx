@@ -16,6 +16,7 @@ import {
   MenuItem,
   type Theme,
   Stack,
+  Typography,
 } from "@mui/material";
 import {
   ChevronRight,
@@ -24,7 +25,6 @@ import {
   Settings,
 } from "@mui/icons-material";
 import { useMemo, useState, useEffect, useCallback } from "react";
-import { format } from "date-fns";
 import { fetchDevices, deleteDevice, connectDevice } from "@/api/devices";
 import { getApiErrorMessage } from "@/api/apiErrorMessages";
 import type { Device, DeviceDetailRow } from "@/types/device";
@@ -60,6 +60,9 @@ export default function DeviceListView({
   const { page, setPage, onPaginationModelChange } = useServerPaginationPage(1);
   const [appliedSearch, setAppliedSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [deviceSessionsById, setDeviceSessionsById] = useState<
+    Record<number, string>
+  >({});
   const [expandedDeviceIds, setExpandedDeviceIds] = useState<Set<number>>(
     () => new Set(),
   );
@@ -88,9 +91,14 @@ export default function DeviceListView({
 
   const connectMutation = useMutation({
     mutationFn: connectDevice,
-    onSuccess: (res) => {
+    onSuccess: (res, deviceId) => {
       if (!res.success) {
         window.alert(getApiErrorMessage(t, res.code, res.status));
+        return;
+      }
+      const session = res.data?.session;
+      if (typeof session === "string" && session.trim().length > 0) {
+        setDeviceSessionsById((prev) => ({ ...prev, [deviceId]: session }));
       }
     },
   });
@@ -195,6 +203,7 @@ export default function DeviceListView({
           isDeviceDetailRow(row) ? DEVICE_GRID_COLUMN_COUNT : 1,
         renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
           if (isDeviceDetailRow(params.row)) {
+            const deviceId = params.row.parent.id;
             return (
               <Box
                 component="div"
@@ -207,8 +216,45 @@ export default function DeviceListView({
                   bgcolor: "grey.200",
                 }}
               >
-                <Stack direction="row" spacing={1}>
-                  <Button sx={{ bgcolor: "red" }}>a</Button>
+                <Stack direction="row" sx={{ gap: 1, ml: 1 }}>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    disabled={connectMutation.isPending}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (deviceSessionsById[deviceId]) {
+                        window.alert("이미 토큰(session)을 보유 중입니다.");
+                        return;
+                      }
+                      connectMutation.mutate(deviceId);
+                    }}
+                  >
+                    Token
+                  </Button>
+                  <Typography
+                    variant="body2"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    title={deviceSessionsById[deviceId] ?? ""}
+                    sx={{
+                      bgcolor: "black",
+                      color: "white",
+                      px: 1,
+                      borderRadius: 0.5,
+                      fontFamily: "monospace",
+                      minHeight: 32,
+                      maxWidth: 360,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {deviceSessionsById[deviceId] ?? ""}
+                  </Typography>
+                </Stack>
+                <Stack direction="row" sx={{ gap: 1, mt: 1, ml: 1 }}>
                   <Button sx={{ bgcolor: "blue" }}>b</Button>
                 </Stack>
               </Box>
