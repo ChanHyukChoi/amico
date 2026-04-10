@@ -1,5 +1,4 @@
 //#region imports
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -29,10 +28,14 @@ import type { User, UserDetailRow } from "@/types/user";
 //#endregion
 
 //#region types
-
 const USER_GRID_COLUMN_COUNT = 6;
 
 type UserGridRow = User | UserDetailRow;
+
+type UserListViewProps = {
+  onAddUser: () => void;
+  onEditUser: (userId: number) => void;
+};
 
 //#endregion
 
@@ -90,16 +93,11 @@ function compareUsersByField(
 
 //#region component
 
-type UserListViewProps = {
-  onAddUser: () => void;
-  onEditUser: (userId: number) => void;
-};
-
 export default function UserListView({
   onAddUser,
   onEditUser,
 }: UserListViewProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { page, setPage, onPaginationModelChange } = useServerPaginationPage(1);
   const [appliedSearch, setAppliedSearch] = useState("");
@@ -317,14 +315,7 @@ export default function UserListView({
         },
       },
     ],
-    [
-      t,
-      i18n.language,
-      onEditUser,
-      rowMenu.openMenu,
-      expandedUserIds,
-      toggleUserExpanded,
-    ],
+    [t, onEditUser, rowMenu.openMenu, expandedUserIds, toggleUserExpanded],
   );
   //#endregion
 
