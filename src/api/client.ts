@@ -157,11 +157,32 @@ export async function requestEnvelope<T>(
         typeof p.code === "string" ? p.code : API_ERROR_CODES.UNKNOWN;
       return { success: false, code, status };
     }
-    if (p.success === true && "data" in p) {
+    if (p.success === true) {
       if (!res.ok) {
         return { success: false, code: API_ERROR_CODES.UNKNOWN, status };
       }
-      return { success: true, data: p.data as T };
+      if ("data" in p) {
+        if (p.data !== null && p.data !== undefined) {
+          return { success: true, data: p.data as T };
+        }
+        // data 키는 있으나 null/undefined — 세션 등이 형제 필드인 계약 대비
+        const withSiblings = { ...(p as Record<string, unknown>) };
+        delete withSiblings.success;
+        delete withSiblings.code;
+        delete withSiblings.data;
+        if (Object.keys(withSiblings).length > 0) {
+          return { success: true, data: withSiblings as T };
+        }
+        return { success: true, data: p.data as T };
+      }
+      // success: true 인데 data 키가 없음 — 토큰·세션이 최상위에만 있는 계약
+      const topLevel = { ...(p as Record<string, unknown>) };
+      delete topLevel.success;
+      delete topLevel.code;
+      if (Object.keys(topLevel).length > 0) {
+        return { success: true, data: topLevel as T };
+      }
+      return { success: true, data: undefined as T };
     }
   }
 

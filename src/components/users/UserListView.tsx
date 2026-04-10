@@ -16,8 +16,6 @@ import {
 } from "@mui/material";
 import { ChevronRight, ExpandMore, MoreVert } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { format } from "date-fns";
-import { ko as dateFnsKo, enUS as dateFnsEn } from "date-fns/locale";
 import { fetchUsers, deleteUser } from "@/api/users";
 import type { User, UserDetailRow } from "@/types/user";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
@@ -74,19 +72,6 @@ function compareUsersByField(
       );
     default:
       return 0;
-  }
-}
-
-function formatUserTimestamp(
-  iso: string | undefined,
-  language: string,
-): string {
-  if (!iso) return "-";
-  try {
-    const locale = language.startsWith("ko") ? dateFnsKo : dateFnsEn;
-    return format(new Date(iso), "yyyy-MM-dd HH:mm", { locale });
-  } catch {
-    return iso;
   }
 }
 

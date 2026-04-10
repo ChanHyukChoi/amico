@@ -220,7 +220,10 @@ export default function DeviceListView({
                   <Button
                     variant="contained"
                     color="error"
-                    disabled={connectMutation.isPending}
+                    disabled={
+                      connectMutation.isPending &&
+                      connectMutation.variables === deviceId
+                    }
                     onClick={(e) => {
                       e.stopPropagation();
                       if (deviceSessionsById[deviceId]) {
@@ -255,7 +258,13 @@ export default function DeviceListView({
                   </Typography>
                 </Stack>
                 <Stack direction="row" sx={{ gap: 1, mt: 1, ml: 1 }}>
-                  <Button sx={{ bgcolor: "blue" }}>b</Button>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    disabled={!deviceSessionsById[deviceId]}
+                  >
+                    Check
+                  </Button>
                 </Stack>
               </Box>
             );
@@ -390,6 +399,9 @@ export default function DeviceListView({
       controlMenu.openMenu,
       expandedDeviceIds,
       toggleDeviceExpanded,
+      deviceSessionsById,
+      connectMutation.isPending,
+      connectMutation.variables,
     ],
   );
 
