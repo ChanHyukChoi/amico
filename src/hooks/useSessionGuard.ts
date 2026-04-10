@@ -1,11 +1,15 @@
+//#region imports
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { validateSession } from "@/api/auth";
+//#endregion
 
+//#region constants
 const POLL_INTERVAL_MS = 30_000;
 
 const sessionPollEnabled =
   import.meta.env.VITE_AUTH_SESSION_POLL === "true";
+//#endregion
 
 /**
  * 인증된 상태에서 주기적으로 서버 세션 유효성을 확인한다.
@@ -16,6 +20,7 @@ const sessionPollEnabled =
  * 로그인 직후 로그아웃되는 문제를 막기 위함. 단일 세션 연동 시 `.env`에
  * VITE_AUTH_SESSION_POLL=true 로 켭니다.
  */
+//#region hook
 export function useSessionGuard() {
   const isAuthenticated = useAuthStore((s) => !!s.accessToken);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -48,3 +53,4 @@ export function useSessionGuard() {
     };
   }, [isAuthenticated]);
 }
+//#endregion

@@ -1,7 +1,10 @@
+//#region imports
 import { useTranslation } from "react-i18next";
 import { Typography } from "@mui/material";
 import { DeviceSettingsSectionPanel } from "@/components/Devices/settings/DeviceSettingsSectionPanel";
+//#endregion
 
+//#region helpers
 function PlaceholderBody() {
   const { t } = useTranslation();
   return (
@@ -10,7 +13,9 @@ function PlaceholderBody() {
     </Typography>
   );
 }
+//#endregion
 
+//#region sections
 export function DeviceSettingsIdentificationSection() {
   const { t } = useTranslation();
   return (
@@ -118,3 +123,4 @@ export function DeviceSettingsAccessDisplaySection() {
     </DeviceSettingsSectionPanel>
   );
 }
+//#endregion

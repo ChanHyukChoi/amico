@@ -1,4 +1,5 @@
 /** 저장·전송 전 정규화: 공백, 따옴표, 중복 `Bearer ` 제거 */
+//#region functions
 export function normalizeAccessToken(token: string): string {
   let t = token.trim();
   if (
@@ -12,3 +13,4 @@ export function normalizeAccessToken(token: string): string {
   }
   return t;
 }
+//#endregion

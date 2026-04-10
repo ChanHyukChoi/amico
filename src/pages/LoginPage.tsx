@@ -1,3 +1,4 @@
+//#region imports
 import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,13 +7,18 @@ import { useTranslation } from "react-i18next";
 import { login } from "@/api/auth";
 import { getApiErrorMessage } from "@/api/apiErrorMessages";
 import type { LoginRequest } from "@/types/auth";
+//#endregion
 
+//#region schemas
 const schema = z.object({
   username: z.string().min(1),
   password: z.string().min(1),
 });
 
 type FormValues = z.infer<typeof schema>;
+//#endregion
+
+//#region component
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -96,3 +102,4 @@ export function LoginPage() {
     </div>
   );
 }
+//#endregion

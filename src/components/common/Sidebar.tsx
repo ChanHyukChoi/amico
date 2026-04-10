@@ -1,13 +1,18 @@
+//#region imports
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+//#endregion
 
+//#region constants
 const navItems: { to: string; key: string }[] = [
   { to: "/", key: "layout.nav.dashboard" },
   { to: "/users", key: "layout.nav.users" },
   { to: "/devices", key: "layout.nav.devices" },
   { to: "/access-log", key: "layout.nav.accessLog" },
 ];
+//#endregion
 
+//#region component
 export function Sidebar() {
   const { t } = useTranslation();
 
@@ -34,3 +39,4 @@ export function Sidebar() {
     </aside>
   );
 }
+//#endregion

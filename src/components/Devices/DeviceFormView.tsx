@@ -1,10 +1,11 @@
+//#region imports
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import { useForm, Controller } from "react-hook-form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { fetchDevice, createDevice, updateDevice } from "@/api/devices";
+import { createDevice, fetchDevice, updateDevice } from "@/api/devices";
 import { getApiErrorMessage } from "@/api/apiErrorMessages";
 import { API_ERROR_CODES } from "@/api/apiErrorCodes";
 import type { CreateDeviceRequest, UpdateDeviceRequest } from "@/types/device";
@@ -13,15 +14,17 @@ import {
   getDeviceModelLabel,
 } from "@/constants/deviceModelOptions";
 import {
-  Button,
-  TextField,
   Box,
-  Stack,
+  Button,
   Checkbox,
   FormControlLabel,
   MenuItem,
+  Stack,
+  TextField,
 } from "@mui/material";
+//#endregion
 
+//#region schemas
 const createDeviceFormSchema = z.object({
   description: z.string().min(1, "필수 입력입니다."),
   ip: z
@@ -51,7 +54,9 @@ const editDeviceFormSchema = z.object({
 type CreateDeviceFormValues = z.infer<typeof createDeviceFormSchema>;
 type EditDeviceFormValues = z.infer<typeof editDeviceFormSchema>;
 type DeviceFormValues = CreateDeviceFormValues | EditDeviceFormValues;
+//#endregion
 
+//#region component
 export default function DeviceFormView({
   mode,
   onRequestClose,
@@ -328,3 +333,4 @@ export default function DeviceFormView({
     </Box>
   );
 }
+//#endregion

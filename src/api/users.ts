@@ -1,3 +1,4 @@
+//#region imports
 import { requestEnvelope } from "@/api/client";
 import type { ApiResponse, PaginatedResponse } from "@/types/common";
 import type {
@@ -6,7 +7,9 @@ import type {
   CreateUserRequest,
   UpdateUserRequest,
 } from "@/types/user";
+//#endregion
 
+//#region api
 export async function fetchUsers(
   params?: UserListParams,
 ): Promise<ApiResponse<PaginatedResponse<User>>> {
@@ -46,3 +49,4 @@ export async function updateUser(
 export async function deleteUser(id: number): Promise<ApiResponse<void>> {
   return requestEnvelope<void>(`/api/users/${id}`, { method: "DELETE" });
 }
+//#endregion

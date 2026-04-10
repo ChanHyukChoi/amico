@@ -1,9 +1,14 @@
+//#region imports
 import { normalizeAccessToken } from "@/lib/accessToken";
 import { isJwtExpiredOnClient } from "@/lib/jwtExpiry";
 import { create } from "zustand";
+//#endregion
 
+//#region constants
 const STORAGE_KEY = "hid-amico-access-token";
+//#endregion
 
+//#region helpers
 function getStoredToken(): string | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -27,7 +32,9 @@ function readStoredTokenOrClearIfJwtExpired(): string | null {
   }
   return null;
 }
+//#endregion
 
+//#region types
 export type LogoutReason = "SESSION_REPLACED" | null;
 
 interface AuthState {
@@ -38,7 +45,9 @@ interface AuthState {
   consumeLogoutReason: () => LogoutReason;
   isAuthenticated: () => boolean;
 }
+//#endregion
 
+//#region store
 export const useAuthStore = create<AuthState>((set, get) => ({
   accessToken: readStoredTokenOrClearIfJwtExpired(),
   logoutReason: null,
@@ -69,3 +78,4 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
   isAuthenticated: () => !!get().accessToken,
 }));
+//#endregion

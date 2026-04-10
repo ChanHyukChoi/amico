@@ -1,3 +1,4 @@
+//#region auth
 /** 로그인 요청 */
 export interface LoginRequest {
   username: string;
@@ -8,3 +9,4 @@ export interface LoginRequest {
 export interface LoginResponse {
   token: string;
 }
+//#endregion

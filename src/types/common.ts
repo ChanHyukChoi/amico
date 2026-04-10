@@ -1,3 +1,4 @@
+//#region api
 /** API 성공 응답 (래핑된 REST — 서버 `success: true`) */
 export interface ApiSuccessResponse<T = unknown> {
   success: true;
@@ -34,3 +35,4 @@ export function isApiError<T>(
 ): r is ApiErrorResponse {
   return !r.success;
 }
+//#endregion

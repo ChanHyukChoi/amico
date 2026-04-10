@@ -2,6 +2,7 @@
  * Bearer 토큰이 JWT 형식이고 payload에 exp가 있으면, 클라이언트 시각 기준 만료 여부.
  * JWT가 아니거나 exp가 없으면 false — 서버·401 처리에 맡김.
  */
+//#region functions
 export function isJwtExpiredOnClient(token: string): boolean {
   const expSec = getJwtExpirationUnix(token);
   if (expSec == null) return false;
@@ -27,3 +28,4 @@ function getJwtExpirationUnix(token: string): number | null {
     return null;
   }
 }
+//#endregion

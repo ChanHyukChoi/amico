@@ -1,11 +1,16 @@
+//#region imports
 import { useAuthStore } from "@/store/authStore";
 import type { ApiResponse } from "@/types/common";
 import { API_ERROR_CODES } from "@/api/apiErrorCodes";
+//#endregion
 
+//#region constants
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
 
 export const AUTH_LOGIN_PATH = "/auth/login";
+//#endregion
 
+//#region helpers
 function logJsonParseFailure(status: number, textPreview: string): void {
   if (!import.meta.env.DEV && import.meta.env.VITE_API_DEBUG !== "true") return;
   console.warn(`[API] JSON parse failed (HTTP ${status}):`, textPreview);
@@ -39,7 +44,9 @@ export function apply401AuthPolicy(path: string, code: string): void {
     code === API_ERROR_CODES.AUTH_SESSION_REPLACED ? "SESSION_REPLACED" : null;
   useAuthStore.getState().clearAuth(reason);
 }
+//#endregion
 
+//#region transport
 export async function transportFetch(
   path: string,
   init: RequestInit = {},
@@ -72,6 +79,7 @@ export async function transportFetch(
 
   return res;
 }
+//#endregion
 
 /**
  * 래핑 REST 응답 `{ success, data }` 파싱.
@@ -79,6 +87,7 @@ export async function transportFetch(
  * - 본문 `success: false`면 HTTP 200이어도 실패
  * - 401: 본문 `code`·경로에 따라 인증 정리
  */
+//#region api
 export async function requestEnvelope<T>(
   path: string,
   init: RequestInit = {},
@@ -194,3 +203,4 @@ export async function requestEnvelope<T>(
 
   return { success: false, code: API_ERROR_CODES.UNKNOWN, status };
 }
+//#endregion

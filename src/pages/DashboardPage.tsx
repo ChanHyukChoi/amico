@@ -1,5 +1,8 @@
+//#region imports
 import { useTranslation } from "react-i18next";
+//#endregion
 
+//#region component
 export function DashboardPage() {
   const { t } = useTranslation();
   return (
@@ -9,3 +12,4 @@ export function DashboardPage() {
     </div>
   );
 }
+//#endregion

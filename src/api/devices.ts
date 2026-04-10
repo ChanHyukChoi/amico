@@ -1,3 +1,4 @@
+//#region imports
 import { requestEnvelope } from "@/api/client";
 import type { ApiResponse, PaginatedResponse } from "@/types/common";
 import type {
@@ -6,7 +7,9 @@ import type {
   CreateDeviceRequest,
   UpdateDeviceRequest,
 } from "@/types/device";
+//#endregion
 
+//#region api
 export async function fetchDevices(
   params?: DeviceListParams,
 ): Promise<ApiResponse<PaginatedResponse<Device>>> {
@@ -46,3 +49,4 @@ export async function updateDevice(
 export async function deleteDevice(id: number): Promise<ApiResponse<void>> {
   return requestEnvelope<void>(`/api/devices/${id}`, { method: "DELETE" });
 }
+//#endregion

@@ -1,3 +1,4 @@
+//#region imports
 import { useTranslation } from "react-i18next";
 import { Link as RouterLink, NavLink, Outlet, useParams } from "react-router-dom";
 import {
@@ -10,14 +11,18 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+//#endregion
 
+//#region constants
 const sxNavButton = {
   borderRadius: 1,
   "&.active": {
     bgcolor: "action.selected",
   },
 };
+//#endregion
 
+//#region component
 export default function DeviceSettingsLayout() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -115,3 +120,4 @@ export default function DeviceSettingsLayout() {
     </Stack>
   );
 }
+//#endregion

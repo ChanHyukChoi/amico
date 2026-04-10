@@ -1,15 +1,18 @@
+//#region imports
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { fetchUser, createUser, updateUser } from "@/api/users";
+import { createUser, fetchUser, updateUser } from "@/api/users";
 import { getApiErrorMessage } from "@/api/apiErrorMessages";
 import { API_ERROR_CODES } from "@/api/apiErrorCodes";
 import type { CreateUserRequest, UpdateUserRequest } from "@/types/user";
-import { Button, TextField, Box, Stack } from "@mui/material";
+import { Box, Button, Stack, TextField } from "@mui/material";
+//#endregion
 
+//#region schemas
 const createUserFormSchema = z
   .object({
     userId: z.string().min(1, "필수 입력입니다."),
@@ -47,7 +50,9 @@ const editUserFormSchema = z
 type CreateUserFormValues = z.infer<typeof createUserFormSchema>;
 type EditUserFormValues = z.infer<typeof editUserFormSchema>;
 type UserFormValues = CreateUserFormValues | EditUserFormValues;
+//#endregion
 
+//#region component
 export default function UserFormView({
   mode,
   onRequestClose,
@@ -311,3 +316,4 @@ export default function UserFormView({
     </Box>
   );
 }
+//#endregion

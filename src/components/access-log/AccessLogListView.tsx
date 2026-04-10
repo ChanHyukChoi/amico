@@ -1,3 +1,4 @@
+//#region imports
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
@@ -8,11 +9,15 @@ import { fetchAccessLogs } from "@/api/access-logs";
 import type { AccessLog } from "@/types/access-log";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
+//#endregion
 
+//#region types
 type AppliedTimeFilter =
   | { kind: "none" }
   | { kind: "range"; startTime: number; endTime: number };
+//#endregion
 
+//#region helpers
 function rangeFromDateInputsSec(
   dateFrom: string,
   dateTo: string,
@@ -32,7 +37,9 @@ function rangeFromDateInputsSec(
     endTime: Math.floor(end.getTime() / 1000),
   };
 }
+//#endregion
 
+//#region component
 export default function AccessLogListView() {
   const { t } = useTranslation();
   const { page, setPage, onPaginationModelChange } = useServerPaginationPage(
@@ -229,3 +236,4 @@ export default function AccessLogListView() {
     </Box>
   );
 }
+//#endregion

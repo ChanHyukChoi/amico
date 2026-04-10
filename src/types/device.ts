@@ -1,3 +1,4 @@
+//#region device
 export interface DeviceSettings {
   identificationMode?: number;
   Wiegand?: Object;
@@ -51,3 +52,4 @@ export interface UpdateDeviceRequest {
   settings?: Object;
   isActive?: boolean;
 }
+//#endregion

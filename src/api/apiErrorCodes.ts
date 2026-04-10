@@ -1,4 +1,5 @@
 /** 백엔드 `ApiErrorCodes`와 동일한 문자열 (hid-amico-server 계약) */
+//#region constants
 export const API_ERROR_CODES = {
   AUTH_INVALID_CREDENTIALS: "AUTH_INVALID_CREDENTIALS",
   AUTH_TOKEN_INVALID: "AUTH_TOKEN_INVALID",
@@ -15,5 +16,8 @@ export const API_ERROR_CODES = {
   UNKNOWN: "UNKNOWN",
   CLIENT_NETWORK_ERROR: "CLIENT_NETWORK_ERROR",
 } as const;
+//#endregion
 
+//#region types
 export type ApiErrorCode = (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];
+//#endregion

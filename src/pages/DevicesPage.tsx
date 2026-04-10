@@ -1,9 +1,13 @@
+//#region imports
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DeviceListView from "@/components/Devices/DeviceListView";
 import DeviceFormView from "@/components/Devices/DeviceFormView";
 import DeviceSettingsLayout from "@/components/Devices/settings/DeviceSettingsLayout";
+//#endregion
+
+//#region component
 
 export function DevicesPage() {
   const { id } = useParams<{ id: string }>();
@@ -54,3 +58,4 @@ export function DevicesPage() {
     </>
   );
 }
+//#endregion

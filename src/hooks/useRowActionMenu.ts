@@ -1,10 +1,13 @@
+//#region imports
 import { useCallback, useState } from "react";
 import type { MouseEvent } from "react";
+//#endregion
 
 /**
  * DataGrid 행 더보기(⋯) 메뉴: 앵커 + 선택 행 상태.
  * 목록 화면에서 반복되는 패턴을 묶은 초안 훅.
  */
+//#region hook
 export function useRowActionMenu<T>() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedRow, setSelectedRow] = useState<T | null>(null);
@@ -28,3 +31,4 @@ export function useRowActionMenu<T>() {
     menuOpen: Boolean(anchorEl),
   };
 }
+//#endregion

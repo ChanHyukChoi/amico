@@ -1,7 +1,10 @@
+//#region imports
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { logout } from "@/api/auth";
+//#endregion
 
+//#region component
 export function TopBar() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -24,3 +27,4 @@ export function TopBar() {
     </header>
   );
 }
+//#endregion

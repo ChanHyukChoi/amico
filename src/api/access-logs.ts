@@ -1,7 +1,10 @@
+//#region imports
 import { requestEnvelope } from "@/api/client";
 import type { ApiResponse, PaginatedResponse } from "@/types/common";
 import type { AccessLog, AccessLogListParams } from "@/types/access-log";
+//#endregion
 
+//#region api
 export async function fetchAccessLogs(
   params?: AccessLogListParams,
 ): Promise<ApiResponse<PaginatedResponse<AccessLog>>> {
@@ -33,3 +36,4 @@ export async function deleteAccessLog(
     method: "DELETE",
   });
 }
+//#endregion

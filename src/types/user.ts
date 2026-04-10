@@ -1,3 +1,4 @@
+//#region user
 /** 사용자 엔티티 */
 export interface User {
   id: number;
@@ -40,3 +41,4 @@ export type UserDetailRow = {
   __isDetail: true;
   parent: User;
 };
+//#endregion

@@ -1,8 +1,9 @@
 //#region imports
 
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DataGrid,
   type GridColDef,
@@ -17,7 +18,7 @@ import {
   type Theme,
 } from "@mui/material";
 import { MoreVert, Settings } from "@mui/icons-material";
-import { useMemo, useState } from "react";
+
 import { fetchDevices, deleteDevice } from "@/api/devices";
 import type { Device } from "@/types/device";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
@@ -28,10 +29,16 @@ import { getDeviceModelLabel } from "@/constants/deviceModelOptions";
 
 //#endregion
 
+//#region types
+
 type DeviceListViewProps = {
   onAddDevice: () => void;
   onEditDevice: (deviceId: number) => void;
 };
+
+//#endregion
+
+//#region component
 
 export default function DeviceListView({
   onAddDevice,
@@ -45,6 +52,7 @@ export default function DeviceListView({
   const [searchValue, setSearchValue] = useState("");
   const rowMenu = useRowActionMenu<Device>();
 
+  //#region queries
   const { data, isLoading } = useQuery({
     queryKey: ["devices", page, appliedSearch],
     queryFn: () =>
@@ -60,7 +68,9 @@ export default function DeviceListView({
       rowMenu.closeMenu();
     },
   });
+  //#endregion
 
+  //#region handlers
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setAppliedSearch(searchValue.trim());
@@ -90,7 +100,9 @@ export default function DeviceListView({
     }
     rowMenu.closeMenu();
   };
+  //#endregion
 
+  //#region grid
   const columns = useMemo<GridColDef<Device>[]>(
     () => [
       {
@@ -160,7 +172,9 @@ export default function DeviceListView({
     ],
     [t, onEditDevice, rowMenu.openMenu],
   );
+  //#endregion
 
+  //#region render
   return (
     <Box
       sx={{
@@ -245,4 +259,7 @@ export default function DeviceListView({
       />
     </Box>
   );
+  //#endregion
 }
+
+//#endregion

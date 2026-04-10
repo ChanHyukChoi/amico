@@ -1,3 +1,4 @@
+//#region access-log
 export const AccessEvent = {
   INVALID_READER: 1,
   INVALID_IDENTIFICATION_RULE: 2,
@@ -42,3 +43,4 @@ export interface AccessLogListParams {
   userId?: number; // 선택: 특정 유저만
   deviceId?: number; // 선택: 특정 리더기만
 }
+//#endregion

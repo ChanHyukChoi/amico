@@ -1,3 +1,4 @@
+//#region imports
 import {
   AUTH_LOGIN_PATH,
   transportFetch,
@@ -8,7 +9,9 @@ import { API_ERROR_CODES } from "@/api/apiErrorCodes";
 import type { LoginRequest, LoginResponse } from "@/types/auth";
 import type { ApiResponse } from "@/types/common";
 import { useAuthStore } from "@/store/authStore";
+//#endregion
 
+//#region helpers
 /** 로그인 200 본문에서 토큰 추출 — `token`, `accessToken`, `{ success, data }` 등 */
 function extractTokenFromLoginJson(json: unknown): string | null {
   if (!json || typeof json !== "object") return null;
@@ -28,12 +31,14 @@ function extractTokenFromLoginJson(json: unknown): string | null {
 
   return null;
 }
+//#endregion
 
 /**
  * POST /auth/login
  * 성공: `{ "token": string }` 등 (래핑·필드명은 extractTokenFromLoginJson 참고)
  * 실패: `{ "success": false, "code": string }` + HTTP 401 등
  */
+//#region api
 export async function login(
   body: LoginRequest,
 ): Promise<ApiResponse<LoginResponse>> {
@@ -181,3 +186,4 @@ export async function validateSession(): Promise<ApiResponse<void>> {
 export function logout(): void {
   useAuthStore.getState().clearAuth();
 }
+//#endregion

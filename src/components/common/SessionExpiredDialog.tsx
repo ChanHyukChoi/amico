@@ -1,3 +1,4 @@
+//#region imports
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -8,7 +9,9 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { useAuthStore } from "@/store/authStore";
+//#endregion
 
+//#region component
 export function SessionExpiredDialog() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -42,3 +45,4 @@ export function SessionExpiredDialog() {
     </Dialog>
   );
 }
+//#endregion

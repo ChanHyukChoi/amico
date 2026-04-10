@@ -1,8 +1,12 @@
+//#region imports
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import UserListView from "@/components/users/UserListView";
 import UserFormView from "@/components/users/UserFormView";
+//#endregion
+
+//#region component
 
 export function UsersPage() {
   const { id } = useParams<{ id: string }>();
@@ -33,7 +37,7 @@ export function UsersPage() {
             }
           }}
           maxWidth="sm"
-          fullWidth={true}
+          fullWidth
           scroll="paper"
         >
           <DialogContent>
@@ -48,3 +52,4 @@ export function UsersPage() {
     </>
   );
 }
+//#endregion

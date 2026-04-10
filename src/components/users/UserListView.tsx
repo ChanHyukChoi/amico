@@ -1,31 +1,42 @@
+//#region imports
+
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronRight, ExpandMore, MoreVert } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+  type Theme,
+} from "@mui/material";
 import {
   DataGrid,
   type GridColDef,
   type GridRenderCellParams,
   type GridSortModel,
 } from "@mui/x-data-grid";
-import {
-  IconButton,
-  Button,
-  TextField,
-  Box,
-  Stack,
-  type Theme,
-} from "@mui/material";
-import { ChevronRight, ExpandMore, MoreVert } from "@mui/icons-material";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchUsers, deleteUser } from "@/api/users";
-import type { User, UserDetailRow } from "@/types/user";
-import { useRowActionMenu } from "@/hooks/useRowActionMenu";
-import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
+
+import { deleteUser, fetchUsers } from "@/api/users";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
+import { useRowActionMenu } from "@/hooks/useRowActionMenu";
+import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
+import type { User, UserDetailRow } from "@/types/user";
+
+//#endregion
+
+//#region types
 
 const USER_GRID_COLUMN_COUNT = 6;
 
 type UserGridRow = User | UserDetailRow;
+
+//#endregion
+
+//#region helpers
 
 function isUserDetailRow(row: UserGridRow): row is UserDetailRow {
   return "__isDetail" in row && row.__isDetail === true;
@@ -75,6 +86,10 @@ function compareUsersByField(
   }
 }
 
+//#endregion
+
+//#region component
+
 type UserListViewProps = {
   onAddUser: () => void;
   onEditUser: (userId: number) => void;
@@ -95,10 +110,13 @@ export default function UserListView({
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
   const rowMenu = useRowActionMenu<User>();
 
+  //#region effects
   useEffect(() => {
     setExpandedUserIds(new Set());
   }, [page, appliedSearch]);
+  //#endregion
 
+  //#region queries
   const { data, isLoading } = useQuery({
     queryKey: ["users", page, appliedSearch],
     queryFn: () =>
@@ -114,7 +132,9 @@ export default function UserListView({
       rowMenu.closeMenu();
     },
   });
+  //#endregion
 
+  //#region handlers
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setAppliedSearch(searchValue.trim());
@@ -169,7 +189,9 @@ export default function UserListView({
       rowMenu.closeMenu();
     }
   };
+  //#endregion
 
+  //#region grid
   const columns = useMemo<GridColDef<UserGridRow>[]>(
     () => [
       {
@@ -304,7 +326,9 @@ export default function UserListView({
       toggleUserExpanded,
     ],
   );
+  //#endregion
 
+  //#region render
   return (
     <Box
       sx={{
@@ -375,10 +399,10 @@ export default function UserListView({
             sx={{
               "& .MuiDataGrid-cell:focus": { outline: "none" },
               /* 기본 셀의 text-overflow: ellipsis가 아이콘·인접 텍스트에 잘림/점(…) 조각으로 보이는 현상 방지 */
-              "& .MuiDataGrid-columnHeader[data-field='expandToggle']": {
+              "& .MuiDataGrid-columnHeader[data-field='toggleDetails']": {
                 px: 0,
               },
-              "& .MuiDataGrid-row:not(.user-list-detail-row) .MuiDataGrid-cell[data-field='expandToggle']":
+              "& .MuiDataGrid-row:not(.user-list-detail-row) .MuiDataGrid-cell[data-field='toggleDetails']":
                 {
                   px: 0,
                   textOverflow: "clip",
@@ -408,4 +432,7 @@ export default function UserListView({
       />
     </Box>
   );
+  //#endregion
 }
+
+//#endregion
