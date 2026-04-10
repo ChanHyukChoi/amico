@@ -25,7 +25,8 @@ import {
   Settings,
 } from "@mui/icons-material";
 import { useMemo, useState, useEffect, useCallback } from "react";
-import { fetchDevices, deleteDevice, connectDevice } from "@/api/devices";
+import { fetchDevices, deleteDevice } from "@/api/devices";
+import { connectAmicoDevice } from "@/api/vendors/amico";
 import { getApiErrorMessage } from "@/api/apiErrorMessages";
 import type { Device, DeviceDetailRow } from "@/types/device";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
@@ -90,7 +91,7 @@ export default function DeviceListView({
   }, [page, appliedSearch]);
 
   const connectMutation = useMutation({
-    mutationFn: connectDevice,
+    mutationFn: connectAmicoDevice,
     onSuccess: (res, deviceId) => {
       if (!res.success) {
         window.alert(getApiErrorMessage(t, res.code, res.status));
@@ -102,7 +103,6 @@ export default function DeviceListView({
       }
     },
   });
-
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setAppliedSearch(searchValue.trim());
