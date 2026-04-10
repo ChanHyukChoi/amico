@@ -146,6 +146,7 @@ export async function requestEnvelope<T>(
     return { success: false, code: API_ERROR_CODES.UNKNOWN, status };
   }
 
+  // 본문이 `{ success: false, code }` envelope이면 HTTP 상태(예: 502)와 무관하게 `code`로 실패 처리
   if (parsed && typeof parsed === "object" && "success" in parsed) {
     const p = parsed as {
       success: unknown;
