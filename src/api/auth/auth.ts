@@ -4,8 +4,8 @@ import {
   transportFetch,
   parseApiErrorCodeFromText,
   apply401AuthPolicy,
-} from "@/api/client";
-import { API_ERROR_CODES } from "@/api/apiErrorCodes";
+} from "@/api/clients/client";
+import { API_ERROR_CODES } from "@/api/common/apiErrorCodes";
 import type { LoginRequest, LoginResponse } from "@/types/auth";
 import type { ApiResponse } from "@/types/common";
 import { useAuthStore } from "@/store/authStore";

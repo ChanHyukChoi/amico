@@ -1,7 +1,7 @@
 //#region imports
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { validateSession } from "@/api/auth";
+import { validateSession } from "@/api/auth/auth";
 //#endregion
 
 //#region constants

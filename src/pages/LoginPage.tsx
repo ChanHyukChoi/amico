@@ -4,8 +4,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { login } from "@/api/auth";
-import { getApiErrorMessage } from "@/api/apiErrorMessages";
+import { login } from "@/api/auth/auth";
+import { getApiErrorMessage } from "@/api/common/apiErrorMessages";
 import type { LoginRequest } from "@/types/auth";
 //#endregion
 

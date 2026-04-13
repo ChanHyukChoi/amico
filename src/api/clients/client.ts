@@ -1,7 +1,7 @@
 //#region imports
 import { useAuthStore } from "@/store/authStore";
 import type { ApiResponse } from "@/types/common";
-import { API_ERROR_CODES } from "@/api/apiErrorCodes";
+import { API_ERROR_CODES } from "@/api/common/apiErrorCodes";
 //#endregion
 
 //#region constants

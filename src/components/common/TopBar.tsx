@@ -1,7 +1,7 @@
 //#region imports
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { logout } from "@/api/auth";
+import { logout } from "@/api/auth/auth";
 //#endregion
 
 //#region component

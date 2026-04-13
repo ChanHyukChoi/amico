@@ -5,9 +5,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { createUser, fetchUser, updateUser } from "@/api/users";
-import { getApiErrorMessage } from "@/api/apiErrorMessages";
-import { API_ERROR_CODES } from "@/api/apiErrorCodes";
+import { createUser, fetchUser, updateUser } from "@/api/users/users";
+import { getApiErrorMessage } from "@/api/common/apiErrorMessages";
+import { API_ERROR_CODES } from "@/api/common/apiErrorCodes";
 import type { CreateUserRequest, UpdateUserRequest } from "@/types/user";
 import { Box, Button, Stack, TextField } from "@mui/material";
 //#endregion

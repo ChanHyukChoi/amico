@@ -5,7 +5,7 @@ import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { Button, TextField, Box, type Theme } from "@mui/material";
 import { endOfDay, format, fromUnixTime, startOfDay } from "date-fns";
 import { useMemo, useState } from "react";
-import { fetchAccessLogs } from "@/api/access-logs";
+import { fetchAccessLogs } from "@/api/clients/access-logs";
 import type { AccessLog } from "@/types/access-log";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
 import { ListPageHeader } from "@/components/common/ListPageHeader";

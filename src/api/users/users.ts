@@ -1,5 +1,5 @@
 //#region imports
-import { requestEnvelope } from "@/api/client";
+import { requestEnvelope } from "@/api/clients/client";
 import type { ApiResponse, PaginatedResponse } from "@/types/common";
 import type {
   User,

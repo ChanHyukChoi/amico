@@ -18,7 +18,7 @@ import {
   type GridSortModel,
 } from "@mui/x-data-grid";
 
-import { deleteUser, fetchUsers } from "@/api/users";
+import { deleteUser, fetchUsers } from "@/api/users/users";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";

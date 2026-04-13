@@ -6,8 +6,8 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createDevice, fetchDevice, updateDevice } from "@/api/devices";
-import { getApiErrorMessage } from "@/api/apiErrorMessages";
-import { API_ERROR_CODES } from "@/api/apiErrorCodes";
+import { getApiErrorMessage } from "@/api/common/apiErrorMessages";
+import { API_ERROR_CODES } from "@/api/common/apiErrorCodes";
 import type { CreateDeviceRequest, UpdateDeviceRequest } from "@/types/device";
 import {
   DEVICE_MODEL_OPTIONS,
