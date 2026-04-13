@@ -1,52 +1,27 @@
-//#region imports
-import { requestEnvelope } from "@/api/clients/client";
-import type { ApiResponse, PaginatedResponse } from "@/types/common";
-import type {
-  User,
-  UserListParams,
-  CreateUserRequest,
-  UpdateUserRequest,
-} from "@/types/user";
-//#endregion
+import instance from "../common/instance";
+import type { CreateUserRequest, UpdateUserRequest } from "@/types/user";
 
-//#region api
-export async function fetchUsers(
-  params?: UserListParams,
-): Promise<ApiResponse<PaginatedResponse<User>>> {
-  const searchParams = new URLSearchParams();
-  if (params?.page != null) searchParams.set("page", String(params.page));
-  if (params?.pageSize != null)
-    searchParams.set("pageSize", String(params.pageSize));
-  if (params?.search) searchParams.set("search", params.search);
-  const query = searchParams.toString();
-  const path = query ? `/api/users?${query}` : "/api/users";
-  return requestEnvelope<PaginatedResponse<User>>(path);
-}
+export const fetchUsers = async () => {
+  const { data } = await instance.get("/users");
+  return data;
+};
 
-export async function fetchUser(id: number): Promise<ApiResponse<User>> {
-  return requestEnvelope<User>(`/api/users/${id}`);
-}
+export const getUser = async (id: number) => {
+  const { data } = await instance.get(`/users/${id}`);
+  return data;
+};
 
-export async function createUser(
-  body: CreateUserRequest,
-): Promise<ApiResponse<User>> {
-  return requestEnvelope<User>("/api/users", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-}
+export const createUser = async (body: CreateUserRequest) => {
+  const { data } = await instance.post("/users", body);
+  return data;
+};
 
-export async function updateUser(
-  id: number,
-  body: UpdateUserRequest,
-): Promise<ApiResponse<User>> {
-  return requestEnvelope<User>(`/api/users/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(body),
-  });
-}
+export const updateUser = async (id: number, body: UpdateUserRequest) => {
+  const { data } = await instance.put(`/users/${id}`, body);
+  return data;
+};
 
-export async function deleteUser(id: number): Promise<ApiResponse<void>> {
-  return requestEnvelope<void>(`/api/users/${id}`, { method: "DELETE" });
-}
-//#endregion
+export const deleteUser = async (id: number) => {
+  const { data } = await instance.delete(`/users/${id}`);
+  return data;
+};

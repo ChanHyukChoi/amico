@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { login } from "@/api/auth/auth";
-import { getApiErrorMessage } from "@/api/common/apiErrorMessages";
 import type { LoginRequest } from "@/types/auth";
 //#endregion
 
@@ -39,13 +38,11 @@ export function LoginPage() {
   });
 
   const onSubmit = async (data: LoginRequest) => {
-    const result = await login(data);
-    if (result.success) {
+    try {
+      await login(data);
       navigate(from, { replace: true });
-    } else {
-      setError("root", {
-        message: getApiErrorMessage(t, result.code, result.status),
-      });
+    } catch {
+      setError("root", { message: t("login.error") });
     }
   };
 
