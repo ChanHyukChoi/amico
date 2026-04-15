@@ -9,6 +9,7 @@ import { SessionExpiredDialog } from "@/components/common/SessionExpiredDialog";
 import { useSessionGuard } from "@/hooks/useSessionGuard";
 import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { UserPage } from "@/pages/UserPage";
 //#endregion
 
 //#region constants
@@ -49,6 +50,7 @@ function App() {
                 }
               >
                 <Route index element={<DashboardPage />} />
+                <Route path="/users" element={<UserPage />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

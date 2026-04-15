@@ -1,15 +1,16 @@
 import instance from "../common/instance";
 import type { LoginRequest } from "@/types/auth";
+import { useAuthStore } from "@/store/authStore";
 
 export const login = async (body: LoginRequest) => {
   const { data } = await instance.post("/auth/login", body);
-  sessionStorage.setItem("access_token", data.token);
+  useAuthStore.getState().setAccessToken(data.token);
   return data;
 };
 
 export const logout = async () => {
   await instance.post("/auth/logout");
-  sessionStorage.removeItem("acess_token");
+  useAuthStore.getState().clearAuth();
 };
 
 export const getSession = async () => {

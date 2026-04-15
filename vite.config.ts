@@ -22,7 +22,7 @@ function forwardAuthorizationHeader(proxy: {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const devProxyTarget = (
-    env.VITE_DEV_PROXY_TARGET || "https://localhost:7255"
+    env.VITE_DEV_PROXY_TARGET || "http://127.0.0.1:5090"
   ).replace(/\/$/, "");
 
   return {
