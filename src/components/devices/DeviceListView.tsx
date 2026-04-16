@@ -32,6 +32,11 @@ const DEVICE_GRID_COLUMN_COUNT = 6;
 
 type DeviceGridRow = Device | DeviceDetailRow;
 
+type DeviceListViewProps = {
+  onAddDevice: () => void;
+  onEditDevice: (deviceId: number) => void;
+};
+
 //#endregion
 
 //#region helpers
@@ -60,7 +65,10 @@ function compareDevicesByField(
 //#endregion
 
 //#region component
-export default function DeviceListView() {
+export default function DeviceListView({
+  onAddDevice,
+  onEditDevice,
+}: DeviceListViewProps) {
   const { t } = useTranslation();
   const { page, setPage, pageSize, onPaginationModelChange } =
     useServerPaginationPage(1, 10);
@@ -298,6 +306,7 @@ export default function DeviceListView() {
       <ListPageHeader
         title={t("devices.list")}
         actionLabel={t("devices.addDevice")}
+        onAction={onAddDevice}
       />
       <Box
         component="form"
