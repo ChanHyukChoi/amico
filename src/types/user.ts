@@ -11,6 +11,13 @@ export interface User {
   updatedAt?: string;
 }
 
+/** GET /api/users 쿼리 (서버 페이지네이션) */
+export interface UserListParams {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+}
+
 /** 사용자 생성 요청 */
 export interface CreateUserRequest {
   username: string;

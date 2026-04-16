@@ -1,10 +1,16 @@
 import instance from "../common/instance";
+import { assertApiSuccess } from "@/lib/apiEnvelope";
 import type { LoginRequest } from "@/types/auth";
+import type { ApiResponse } from "@/types/api";
 import { useAuthStore } from "@/store/authStore";
 
 export const login = async (body: LoginRequest) => {
-  const { data } = await instance.post("/auth/login", body);
-  useAuthStore.getState().setAccessToken(data.token);
+  const { data } = await instance.post<ApiResponse<{ token: string }>>(
+    "/auth/login",
+    body,
+  );
+  assertApiSuccess(data);
+  useAuthStore.getState().setAccessToken(data.data.token);
   return data;
 };
 
@@ -14,7 +20,8 @@ export const logout = async () => {
 };
 
 export const getSession = async () => {
-  const { data } = await instance.get("/auth/session");
+  const { data } = await instance.get<ApiResponse<unknown>>("/auth/session");
+  assertApiSuccess(data);
   return data;
 };
 

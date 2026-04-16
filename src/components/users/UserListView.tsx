@@ -22,6 +22,7 @@ import { deleteUser, fetchUsers } from "@/api/users/users";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
+import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
 import type { User, UserDetailRow } from "@/types/user";
 
 //#endregion
@@ -98,6 +99,8 @@ export default function UserListView({
 }: UserListViewProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { page, setPage, pageSize, onPaginationModelChange } =
+    useServerPaginationPage(1, 10);
   const [appliedSearch, setAppliedSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [expandedUserIds, setExpandedUserIds] = useState<Set<number>>(
@@ -109,13 +112,18 @@ export default function UserListView({
   //#region effects
   useEffect(() => {
     setExpandedUserIds(new Set());
-  }, [appliedSearch]);
+  }, [page, appliedSearch]);
   //#endregion
 
   //#region queries
-  const { data, isLoading } = useQuery({
-    queryKey: ["users"],
-    queryFn: fetchUsers,
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["users", page, pageSize, appliedSearch],
+    queryFn: () =>
+      fetchUsers({
+        page,
+        pageSize,
+        search: appliedSearch || undefined,
+      }),
   });
 
   const deleteMutation = useMutation({
@@ -131,29 +139,20 @@ export default function UserListView({
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setAppliedSearch(searchValue.trim());
+    setPage(1);
   };
 
-  /** 서버는 전체 목록만 반환. 검색은 클라이언트에서 필터. */
-  const items = useMemo(() => {
-    const rows = data ?? [];
-    const q = appliedSearch.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((u) => {
-      const blob = [u.username, u.name, u.department, u.email]
-        .map((x) => (x ?? "").toLowerCase())
-        .join("\0");
-      return blob.includes(q);
-    });
-  }, [data, appliedSearch]);
+  const listRows = data?.data ?? [];
+  const total = data?.total ?? 0;
 
-  /** 표시용 정렬(클라이언트). */
+  /** 현재 페이지 행 — 표시용 정렬만 클라이언트. */
   const sortedItems = useMemo(() => {
     const first = sortModel[0];
-    if (!first?.sort || !first.field) return items;
-    return [...items].sort((a, b) =>
+    if (!first?.sort || !first.field) return listRows;
+    return [...listRows].sort((a, b) =>
       compareUsersByField(a, b, first.field, first.sort as "asc" | "desc"),
     );
-  }, [items, sortModel]);
+  }, [listRows, sortModel]);
 
   const gridRows = useMemo((): UserGridRow[] => {
     const out: UserGridRow[] = [];
@@ -359,6 +358,12 @@ export default function UserListView({
         </Button>
       </Box>
 
+      {isError && (
+        <Box sx={{ color: "error.main", py: 1 }}>
+          {error instanceof Error ? error.message : String(error)}
+        </Box>
+      )}
+
       {isLoading ? (
         <Box sx={{ color: "text.secondary", py: 4 }}>{t("common.loading")}</Box>
       ) : (
@@ -375,6 +380,15 @@ export default function UserListView({
             getRowHeight={({ model }) =>
               isUserDetailRow(model as UserGridRow) ? "auto" : 52
             }
+            pagination
+            paginationMode="server"
+            rowCount={total}
+            paginationModel={{
+              page: page - 1,
+              pageSize,
+            }}
+            onPaginationModelChange={onPaginationModelChange}
+            pageSizeOptions={[10, 25, 50]}
             sortingMode="client"
             sortModel={sortModel}
             onSortModelChange={setSortModel}

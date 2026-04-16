@@ -5,7 +5,7 @@ export interface LoginRequest {
   password: string;
 }
 
-/** 로그인 성공 시 클라이언트에 보관되는 토큰 (응답은 token / accessToken / data 래핑 등 지원) */
+/** 로그인 응답의 `data` 안 필드 (`ApiResponse<{ token: string }>`) */
 export interface LoginResponse {
   token: string;
 }
