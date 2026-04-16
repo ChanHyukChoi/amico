@@ -18,124 +18,80 @@ import {
   type GridSortModel,
 } from "@mui/x-data-grid";
 
-import { deleteUser, fetchUsers } from "@/api/users/users";
+import { fetchDevices } from "@/api/devices/devices";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
-import type { User, UserDetailRow } from "@/types/user";
+import type { Device, DeviceDetailRow } from "@/types/device";
 
 //#endregion
 
 //#region types
-const USER_GRID_COLUMN_COUNT = 6;
+const DEVICE_GRID_COLUMN_COUNT = 6;
 
-type UserGridRow = User | UserDetailRow;
-
-type UserListViewProps = {
-  onAddUser: () => void;
-  onEditUser: (userId: number) => void;
-};
+type DeviceGridRow = Device | DeviceDetailRow;
 
 //#endregion
 
 //#region helpers
-
-function isUserDetailRow(row: UserGridRow): row is UserDetailRow {
+const isDeviceDetailRow = (row: DeviceGridRow): row is DeviceDetailRow => {
   return "__isDetail" in row && row.__isDetail === true;
-}
+};
 
-function compareUsersByField(
-  a: User,
-  b: User,
+function compareDevicesByField(
+  a: Device,
+  b: Device,
   field: string,
   direction: "asc" | "desc",
 ): number {
   const dir = direction === "desc" ? -1 : 1;
   switch (field) {
-    case "username":
+    case "description":
       return (
         dir *
-        String(a.username).localeCompare(String(b.username), undefined, {
-          numeric: true,
+        String(a.description).localeCompare(String(b.description), undefined, {
           sensitivity: "base",
         })
       );
-    case "name":
-      return (
-        dir *
-        String(a.name).localeCompare(String(b.name), undefined, {
-          sensitivity: "base",
-        })
-      );
-    case "department":
-      return (
-        dir *
-        String(a.department ?? "").localeCompare(
-          String(b.department ?? ""),
-          undefined,
-          { sensitivity: "base" },
-        )
-      );
-    case "email":
-      return (
-        dir *
-        String(a.email ?? "").localeCompare(String(b.email ?? ""), undefined, {
-          sensitivity: "base",
-        })
-      );
-    default:
-      return 0;
   }
+  return 0;
 }
-
 //#endregion
 
 //#region component
-
-export default function UserListView({
-  onAddUser,
-  onEditUser,
-}: UserListViewProps) {
+export default function DeviceListView() {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
   const { page, setPage, pageSize, onPaginationModelChange } =
     useServerPaginationPage(1, 10);
   const [appliedSearch, setAppliedSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
-  const [expandedUserIds, setExpandedUserIds] = useState<Set<number>>(
+  const [expandedDeviceIds, setExpandedDeviceIds] = useState<Set<number>>(
     () => new Set(),
   );
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
-  const rowMenu = useRowActionMenu<User>();
+  const rowMenu = useRowActionMenu<Device>();
 
   //#region effects
   useEffect(() => {
-    setExpandedUserIds(new Set());
+    setExpandedDeviceIds(new Set());
   }, [page, appliedSearch]);
   //#endregion
 
   //#region queries
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["users", page, pageSize, appliedSearch],
+    queryKey: ["devices", page, pageSize, appliedSearch],
     queryFn: () =>
-      fetchUsers({
+      fetchDevices({
         page,
         pageSize,
         search: appliedSearch || undefined,
       }),
   });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteUser,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["users"] });
-      rowMenu.closeMenu();
-    },
-  });
   //#endregion
 
   //#region handlers
+
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setAppliedSearch(searchValue.trim());
@@ -150,50 +106,32 @@ export default function UserListView({
     const first = sortModel[0];
     if (!first?.sort || !first.field) return listRows;
     return [...listRows].sort((a, b) =>
-      compareUsersByField(a, b, first.field, first.sort as "asc" | "desc"),
+      compareDevicesByField(a, b, first.field, first.sort as "asc" | "desc"),
     );
   }, [listRows, sortModel]);
 
-  const gridRows = useMemo((): UserGridRow[] => {
-    const out: UserGridRow[] = [];
-    for (const u of sortedItems) {
-      out.push(u);
-      if (expandedUserIds.has(u.id)) {
-        out.push({
-          id: `detail-${u.id}`,
-          __isDetail: true,
-          parent: u,
-        });
+  const gridRows = useMemo((): DeviceGridRow[] => {
+    const out: DeviceGridRow[] = [];
+    for (const d of sortedItems) {
+      out.push(d);
+      if (expandedDeviceIds.has(d.id)) {
+        out.push({ id: `detail-${d.id}`, __isDetail: true, parent: d });
       }
     }
     return out;
-  }, [sortedItems, expandedUserIds]);
+  }, [sortedItems, expandedDeviceIds]);
 
-  const toggleUserExpanded = useCallback((userId: number) => {
-    setExpandedUserIds((prev) => {
+  const toggleDeviceExpanded = useCallback((deviceId: number) => {
+    setExpandedDeviceIds((prev) => {
       const next = new Set(prev);
-      if (next.has(userId)) next.delete(userId);
-      else next.add(userId);
+      if (next.has(deviceId)) next.delete(deviceId);
+      else next.add(deviceId);
       return next;
     });
   }, []);
-
-  const handleEdit = () => {
-    if (rowMenu.selectedRow) onEditUser(rowMenu.selectedRow.id);
-    rowMenu.closeMenu();
-  };
-
-  const handleDelete = () => {
-    if (rowMenu.selectedRow && window.confirm(t("users.deleteConfirm"))) {
-      deleteMutation.mutate(rowMenu.selectedRow.id);
-    } else {
-      rowMenu.closeMenu();
-    }
-  };
   //#endregion
 
-  //#region grid
-  const columns = useMemo<GridColDef<UserGridRow>[]>(
+  const columns = useMemo<GridColDef<DeviceGridRow>[]>(
     () => [
       {
         field: "toggleDetails",
@@ -208,9 +146,9 @@ export default function UserListView({
         display: "flex",
         valueGetter: () => null,
         colSpan: (_value, row) =>
-          isUserDetailRow(row) ? USER_GRID_COLUMN_COUNT : 1,
-        renderCell: (params: GridRenderCellParams<UserGridRow>) => {
-          if (isUserDetailRow(params.row)) {
+          isDeviceDetailRow(row) ? DEVICE_GRID_COLUMN_COUNT : 1,
+        renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
+          if (isDeviceDetailRow(params.row)) {
             return (
               <Box
                 component="div"
@@ -230,17 +168,17 @@ export default function UserListView({
               </Box>
             );
           }
-          const user = params.row;
-          const open = expandedUserIds.has(user.id);
+          const device = params.row;
+          const open = expandedDeviceIds.has(device.id);
           return (
             <IconButton
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                toggleUserExpanded(user.id);
+                toggleDeviceExpanded(device.id);
               }}
               aria-label={
-                open ? t("users.collapseDetails") : t("users.expandDetails")
+                open ? t("devices.collapseDetails") : t("devices.expandDetails")
               }
               aria-expanded={open}
             >
@@ -254,63 +192,89 @@ export default function UserListView({
         },
       },
       {
-        field: "username",
-        headerName: t("users.userId"),
-        flex: 0.8,
-        minWidth: 100,
+        field: "description",
+        headerName: t("devices.description"),
+        flex: 1,
+        minWidth: 80,
         valueGetter: (value, row) =>
-          isUserDetailRow(row) ? "" : (value ?? row.username),
+          isDeviceDetailRow(row) ? "" : (value ?? row.description),
       },
       {
-        field: "name",
-        headerName: t("users.name"),
+        field: "ip",
+        headerName: t("devices.ip"),
         flex: 1,
-        minWidth: 120,
-        renderCell: (params: GridRenderCellParams<UserGridRow>) => {
-          const row = params.row;
-          if (isUserDetailRow(row)) return null;
+        minWidth: 50,
+        valueGetter: (value, row) =>
+          isDeviceDetailRow(row) ? "" : (value ?? row.ip),
+      },
+      {
+        field: "type",
+        headerName: t("devices.type"),
+        flex: 1,
+        minWidth: 50,
+        valueGetter: (value, row) =>
+          isDeviceDetailRow(row) ? "" : (value ?? row.type),
+      },
+      {
+        field: "model",
+        headerName: t("devices.model"),
+        flex: 1,
+        minWidth: 50,
+        valueGetter: (value, row) =>
+          isDeviceDetailRow(row) ? "" : (value ?? row.model),
+      },
+      {
+        field: "userId",
+        headerName: t("devices.userId"),
+        flex: 1,
+        minWidth: 50,
+        valueGetter: (value, row) =>
+          isDeviceDetailRow(row) ? "" : (value ?? row.userId),
+      },
+      {
+        field: "isActive",
+        headerName: t("devices.isActive"),
+        flex: 1,
+        minWidth: 50,
+        valueGetter: (value, row) =>
+          isDeviceDetailRow(row) ? "" : (value ?? row.isActive),
+      },
+      {
+        field: "contorls",
+        headerName: "제어",
+        width: 56,
+        sortable: false,
+        filterable: false,
+        flex: 1,
+        renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
+          const device = params.row;
+          if (isDeviceDetailRow(device)) return null;
           return (
-            <Button
-              variant="text"
+            <IconButton
               size="small"
-              sx={{ textTransform: "none", fontWeight: 600 }}
-              onClick={() => onEditUser(row.id)}
+              onClick={(e) => rowMenu.openMenu(e, device)}
+              aria-label={t("devices.controls")}
             >
-              {row.name}
-            </Button>
+              <MoreVert fontSize="small" />
+            </IconButton>
           );
         },
       },
       {
-        field: "department",
-        headerName: t("users.department"),
-        flex: 1,
-        minWidth: 100,
-        valueGetter: (_, row) =>
-          isUserDetailRow(row) ? "" : (row.department ?? "-"),
-      },
-      {
-        field: "email",
-        headerName: t("users.email"),
-        flex: 1.2,
-        minWidth: 160,
-        valueGetter: (_, row) =>
-          isUserDetailRow(row) ? "" : (row.email ?? "-"),
-      },
-      {
         field: "actions",
-        headerName: t("users.actions"),
+        headerName: t("devices.actions"),
         width: 56,
         sortable: false,
         filterable: false,
-        renderCell: (params: GridRenderCellParams<UserGridRow>) => {
-          const row = params.row;
-          if (isUserDetailRow(row)) return null;
+        flex: 1,
+        renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
+          const device = params.row;
+          if (isDeviceDetailRow(device)) return null;
           return (
             <IconButton
               size="small"
-              onClick={(e) => rowMenu.openMenu(e, row)}
-              aria-label={t("users.actions")}
+              onClick={(e) => rowMenu.openMenu(e, device)}
+              aria-label={t("devices.actions")}
             >
               <MoreVert fontSize="small" />
             </IconButton>
@@ -318,11 +282,9 @@ export default function UserListView({
         },
       },
     ],
-    [t, onEditUser, rowMenu.openMenu, expandedUserIds, toggleUserExpanded],
+    [t],
   );
-  //#endregion
 
-  //#region render
   return (
     <Box
       sx={{
@@ -334,11 +296,9 @@ export default function UserListView({
       }}
     >
       <ListPageHeader
-        title={t("users.list")}
-        actionLabel={t("users.addUser")}
-        onAction={onAddUser}
+        title={t("devices.list")}
+        actionLabel={t("devices.addDevice")}
       />
-
       <Box
         component="form"
         onSubmit={handleSearch}
@@ -373,12 +333,12 @@ export default function UserListView({
             columns={columns}
             getRowId={(row) => row.id}
             getRowClassName={(params) =>
-              isUserDetailRow(params.row as UserGridRow)
-                ? "user-list-detail-row"
+              isDeviceDetailRow(params.row as DeviceGridRow)
+                ? "device-list-detail-row"
                 : ""
             }
             getRowHeight={({ model }) =>
-              isUserDetailRow(model as UserGridRow) ? "auto" : 52
+              isDeviceDetailRow(model as DeviceGridRow) ? "auto" : 52
             }
             pagination
             paginationMode="server"
@@ -395,7 +355,7 @@ export default function UserListView({
             loading={isLoading}
             disableRowSelectionOnClick
             localeText={{
-              noRowsLabel: t("users.noData"),
+              noRowsLabel: t("devices.noData"),
             }}
             sx={{
               "& .MuiDataGrid-cell:focus": { outline: "none" },
@@ -403,13 +363,13 @@ export default function UserListView({
               "& .MuiDataGrid-columnHeader[data-field='toggleDetails']": {
                 px: 0,
               },
-              "& .MuiDataGrid-row:not(.user-list-detail-row) .MuiDataGrid-cell[data-field='toggleDetails']":
+              "& .MuiDataGrid-row:not(.device-list-detail-row) .MuiDataGrid-cell[data-field='toggleDetails']":
                 {
                   px: 0,
                   textOverflow: "clip",
                   justifyContent: "center",
                 },
-              "& .user-list-detail-row .MuiDataGrid-cell": {
+              "& .device-list-detail-row .MuiDataGrid-cell": {
                 borderBottomColor: "transparent",
                 px: 0,
               },
@@ -423,17 +383,7 @@ export default function UserListView({
           />
         </Box>
       )}
-
-      <DataGridRowActionsMenu
-        anchorEl={rowMenu.anchorEl}
-        open={rowMenu.menuOpen}
-        onClose={rowMenu.closeMenu}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
     </Box>
   );
-  //#endregion
 }
-
 //#endregion

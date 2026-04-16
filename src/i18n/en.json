@@ -8,7 +8,8 @@
     "edit": "Edit",
     "loading": "Loading...",
     "comingSoon": "Coming soon",
-    "selectNone": "None"
+    "selectNone": "None",
+    "search": "Search"
   },
   "login": {
     "title": "Login",
@@ -65,7 +66,9 @@
     "passwordChangeOptional": "Leave blank to keep current",
     "isActive": "Active",
     "search": "Search",
-    "actions": "",
+    "expandDetails": "Expand row details",
+    "collapseDetails": "Collapse row details",
+    "actions": "Actions",
     "noData": "No devices registered.",
     "notFound": "Device not found.",
     "backToList": "Back to list",

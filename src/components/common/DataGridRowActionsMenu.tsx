@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 //#endregion
 
 //#region types
-type DataGridRowActionsMenuProps = {
+export type DataGridRowActionsMenuProps = {
   anchorEl: HTMLElement | null;
   open: boolean;
   onClose: () => void;
