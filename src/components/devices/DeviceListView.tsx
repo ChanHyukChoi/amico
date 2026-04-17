@@ -1,7 +1,7 @@
 //#region imports
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, ExpandMore, MoreVert } from "@mui/icons-material";
 import {
   Box,
@@ -19,10 +19,13 @@ import {
 } from "@mui/x-data-grid";
 
 import { fetchDevices } from "@/api/devices/devices";
-import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
+import {
+  getDeviceModelLabel,
+  getDeviceTypeLabel,
+} from "@/constants/deviceModelOptions";
 import type { Device, DeviceDetailRow } from "@/types/device";
 
 //#endregion
@@ -67,7 +70,7 @@ function compareDevicesByField(
 //#region component
 export default function DeviceListView({
   onAddDevice,
-  onEditDevice,
+  onEditDevice: _onEditDevice,
 }: DeviceListViewProps) {
   const { t } = useTranslation();
   const { page, setPage, pageSize, onPaginationModelChange } =
@@ -221,7 +224,9 @@ export default function DeviceListView({
         flex: 1,
         minWidth: 50,
         valueGetter: (value, row) =>
-          isDeviceDetailRow(row) ? "" : (value ?? row.type),
+          isDeviceDetailRow(row)
+            ? ""
+            : getDeviceTypeLabel(String(value ?? row.type ?? ""), t),
       },
       {
         field: "model",
@@ -229,7 +234,13 @@ export default function DeviceListView({
         flex: 1,
         minWidth: 50,
         valueGetter: (value, row) =>
-          isDeviceDetailRow(row) ? "" : (value ?? row.model),
+          isDeviceDetailRow(row)
+            ? ""
+            : getDeviceModelLabel(
+                String(row.type ?? ""),
+                String(value ?? row.model ?? ""),
+                t,
+              ),
       },
       {
         field: "userId",
