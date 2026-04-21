@@ -77,6 +77,15 @@
     "settingsTitle": "Device settings (#{{id}})",
     "settingsSaveSection": "Save this section",
     "settingsEditDevice": "Edit device info",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectConfirm": "Are you sure you want to connect this device?",
+    "connectSuccess": "Device has been connected.",
+    "disconnectConfirm": "Are you sure you want to disconnect this device?",
+    "disconnectSuccess": "Device has been disconnected.",
+    "checkSession": "Check session",
+    "checkSessionSuccess": "Session has been checked.",
+    "checkSessionConfirm": "Are you sure you want to check the session of this device?",
     "settings": {
       "nav": {
         "identification": "Identification mode",

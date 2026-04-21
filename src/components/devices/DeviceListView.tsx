@@ -1,7 +1,7 @@
 //#region imports
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronRight, ExpandMore, MoreVert } from "@mui/icons-material";
 import {
   Box,
@@ -18,26 +18,34 @@ import {
   type GridSortModel,
 } from "@mui/x-data-grid";
 
-import { fetchDevices } from "@/api/devices/devices";
+import { deleteDevice, fetchDevices } from "@/api/devices/devices";
+import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
 import { useServerPaginationPage } from "@/hooks/useServerPaginationPage";
+import { useRowControlMenu } from "@/hooks/useRowControlMenu";
 import {
   getDeviceModelLabel,
   getDeviceTypeLabel,
 } from "@/constants/deviceModelOptions";
 import type { Device, DeviceDetailRow } from "@/types/device";
-
+import { DeviceControlMenu } from "@/components/devices/DeviceControlMenu";
+import {
+  loginDevice,
+  logoutDevice,
+  checkSession,
+} from "@/api/devices/vendor/hid/amico/auth";
+import axios from "axios";
 //#endregion
 
 //#region types
-const DEVICE_GRID_COLUMN_COUNT = 6;
+const DEVICE_GRID_COLUMN_COUNT = 9;
 
 type DeviceGridRow = Device | DeviceDetailRow;
 
 type DeviceListViewProps = {
   onAddDevice: () => void;
-  onEditDevice: (deviceId: number) => void;
+  onEditDevice: (device: Device) => void;
 };
 
 //#endregion
@@ -62,17 +70,80 @@ function compareDevicesByField(
           sensitivity: "base",
         })
       );
+    case "ip":
+      return (
+        dir *
+        String(a.ip).localeCompare(String(b.ip), undefined, {
+          sensitivity: "base",
+        })
+      );
+    case "type":
+      return (
+        dir *
+        String(a.type).localeCompare(String(b.type), undefined, {
+          numeric: true,
+          sensitivity: "base",
+        })
+      );
+    case "model":
+      return (
+        dir *
+        String(a.model).localeCompare(String(b.model), undefined, {
+          numeric: true,
+          sensitivity: "base",
+        })
+      );
+    case "userId":
+      return (
+        dir *
+        String(a.userId).localeCompare(String(b.userId), undefined, {
+          sensitivity: "base",
+        })
+      );
+    case "isActive": {
+      const av = a.isActive ? 1 : 0;
+      const bv = b.isActive ? 1 : 0;
+      return dir * (av - bv);
+    }
+    case "updatedAt": {
+      const at = a.updatedAt ? Date.parse(a.updatedAt) : 0;
+      const bt = b.updatedAt ? Date.parse(b.updatedAt) : 0;
+      return dir * (at - bt);
+    }
+    default:
+      return 0;
   }
-  return 0;
+}
+
+/** 뮤테이션 실패 시 alert용: ApiResponse.message, Axios 본문, HTTP 상태 */
+function getMutationErrorMessage(err: unknown): string {
+  if (axios.isAxiosError(err)) {
+    const d = err.response?.data;
+    if (
+      d &&
+      typeof d === "object" &&
+      "message" in d &&
+      typeof (d as { message: unknown }).message === "string"
+    ) {
+      return (d as { message: string }).message;
+    }
+    const status = err.response?.status;
+    if (status != null) {
+      return `${err.message} (HTTP ${status})`;
+    }
+  }
+  if (err instanceof Error) return err.message;
+  return String(err);
 }
 //#endregion
 
 //#region component
 export default function DeviceListView({
   onAddDevice,
-  onEditDevice: _onEditDevice,
+  onEditDevice,
 }: DeviceListViewProps) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const { page, setPage, pageSize, onPaginationModelChange } =
     useServerPaginationPage(1, 10);
   const [appliedSearch, setAppliedSearch] = useState("");
@@ -82,6 +153,7 @@ export default function DeviceListView({
   );
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
   const rowMenu = useRowActionMenu<Device>();
+  const controlMenu = useRowControlMenu<Device>();
 
   //#region effects
   useEffect(() => {
@@ -98,6 +170,50 @@ export default function DeviceListView({
         pageSize,
         search: appliedSearch || undefined,
       }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteDevice,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["devices"] });
+      rowMenu.closeMenu();
+    },
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: loginDevice,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["devices"] });
+      controlMenu.closeMenu();
+      alert(t("devices.connectSuccess"));
+    },
+    onError: (err) => {
+      alert(getMutationErrorMessage(err));
+    },
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: logoutDevice,
+    onSuccess: (message) => {
+      void queryClient.invalidateQueries({ queryKey: ["devices"] });
+      controlMenu.closeMenu();
+      alert(message);
+    },
+    onError: (err) => {
+      alert(getMutationErrorMessage(err));
+    },
+  });
+
+  const checkSessionMutation = useMutation({
+    mutationFn: checkSession,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["devices"] });
+      controlMenu.closeMenu();
+      alert(t("devices.checkSessionSuccess"));
+    },
+    onError: (err) => {
+      alert(getMutationErrorMessage(err));
+    },
   });
   //#endregion
 
@@ -140,6 +256,52 @@ export default function DeviceListView({
       return next;
     });
   }, []);
+
+  const handleEdit = () => {
+    if (rowMenu.selectedRow) onEditDevice(rowMenu.selectedRow);
+    rowMenu.closeMenu();
+  };
+
+  const handleDelete = () => {
+    if (rowMenu.selectedRow && window.confirm(t("devices.deleteConfirm"))) {
+      deleteMutation.mutate(rowMenu.selectedRow.id);
+    } else {
+      rowMenu.closeMenu();
+    }
+  };
+
+  const handleConnect = () => {
+    if (
+      controlMenu.selectedRow &&
+      window.confirm(t("devices.connectConfirm"))
+    ) {
+      loginMutation.mutate(controlMenu.selectedRow.id);
+    } else {
+      controlMenu.closeMenu();
+    }
+  };
+
+  const handleDisconnect = () => {
+    if (
+      controlMenu.selectedRow &&
+      window.confirm(t("devices.disconnectConfirm"))
+    ) {
+      logoutMutation.mutate(controlMenu.selectedRow.id);
+    } else {
+      controlMenu.closeMenu();
+    }
+  };
+
+  const handleCheckSession = () => {
+    if (
+      controlMenu.selectedRow &&
+      window.confirm(t("devices.checkSessionConfirm"))
+    ) {
+      checkSessionMutation.mutate(controlMenu.selectedRow.id);
+    } else {
+      controlMenu.closeMenu();
+    }
+  };
   //#endregion
 
   const columns = useMemo<GridColDef<DeviceGridRow>[]>(
@@ -271,7 +433,7 @@ export default function DeviceListView({
           return (
             <IconButton
               size="small"
-              onClick={(e) => rowMenu.openMenu(e, device)}
+              onClick={(e) => controlMenu.openMenu(e, device)}
               aria-label={t("devices.controls")}
             >
               <MoreVert fontSize="small" />
@@ -287,12 +449,12 @@ export default function DeviceListView({
         filterable: false,
         flex: 1,
         renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
-          const device = params.row;
-          if (isDeviceDetailRow(device)) return null;
+          const row = params.row;
+          if (isDeviceDetailRow(row)) return null;
           return (
             <IconButton
               size="small"
-              onClick={(e) => rowMenu.openMenu(e, device)}
+              onClick={(e) => rowMenu.openMenu(e, row)}
               aria-label={t("devices.actions")}
             >
               <MoreVert fontSize="small" />
@@ -301,7 +463,13 @@ export default function DeviceListView({
         },
       },
     ],
-    [t],
+    [
+      t,
+      onEditDevice,
+      rowMenu.openMenu,
+      expandedDeviceIds,
+      toggleDeviceExpanded,
+    ],
   );
 
   return (
@@ -403,6 +571,22 @@ export default function DeviceListView({
           />
         </Box>
       )}
+
+      <DataGridRowActionsMenu
+        anchorEl={rowMenu.anchorEl}
+        open={rowMenu.menuOpen}
+        onClose={rowMenu.closeMenu}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+      <DeviceControlMenu
+        anchorEl={controlMenu.anchorEl}
+        open={controlMenu.menuOpen}
+        onClose={controlMenu.closeMenu}
+        onConnect={handleConnect}
+        onDisconnect={handleDisconnect}
+        onCheckSession={handleCheckSession}
+      />
     </Box>
   );
 }

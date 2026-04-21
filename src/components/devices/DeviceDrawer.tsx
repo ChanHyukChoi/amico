@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -65,8 +65,8 @@ export default function DeviceDrawer({
       mode === "update" && device
         ? {
             description: device.description,
-            type: device.type,
-            model: device.model,
+            type: String(device.type),
+            model: String(device.model),
             ip: device.ip,
             userId: device.userId,
             password: "",
@@ -83,27 +83,34 @@ export default function DeviceDrawer({
           },
   });
 
-  const deviceTypeValue = watch("type");
-  const prevDeviceTypeRef = useRef<string | null>(null);
-
   useEffect(() => {
-    if (!open) {
-      prevDeviceTypeRef.current = null;
-      return;
+    if (!open) return;
+    if (mode === "update" && device) {
+      reset({
+        description: device.description,
+        type: String(device.type),
+        model: String(device.model),
+        ip: device.ip,
+        userId: device.userId,
+        password: "",
+        isActive: device.isActive,
+      });
+    } else {
+      reset({
+        description: "",
+        type: "",
+        model: "",
+        ip: "",
+        userId: "",
+        password: "",
+        isActive: true,
+      });
     }
-    if (
-      prevDeviceTypeRef.current !== null &&
-      prevDeviceTypeRef.current !== deviceTypeValue
-    ) {
-      setValue("model", "");
-    }
-    prevDeviceTypeRef.current = deviceTypeValue;
-  }, [open, deviceTypeValue, setValue]);
+  }, [open, mode, device, reset]);
 
-  const typeComboOptions = useMemo(
-    () => getDeviceTypeSelectOptions(),
-    [],
-  );
+  const deviceTypeValue = watch("type");
+
+  const typeComboOptions = useMemo(() => getDeviceTypeSelectOptions(), []);
   const modelComboOptions = useMemo(
     () => getDeviceModelSelectOptions(deviceTypeValue),
     [deviceTypeValue],
@@ -209,7 +216,11 @@ export default function DeviceDrawer({
                   typeComboOptions.find((o) => o.value === field.value) ?? null
                 }
                 onChange={(_, newValue) => {
-                  field.onChange(newValue?.value ?? "");
+                  const next = newValue?.value ?? "";
+                  if (next !== field.value) {
+                    setValue("model", "");
+                  }
+                  field.onChange(next);
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -269,7 +280,7 @@ export default function DeviceDrawer({
           <TextField
             label={
               mode === "update"
-                ? t("devices.passwordOptional")
+                ? t("devices.passwordChangeOptional")
                 : t("devices.password")
             }
             type="password"

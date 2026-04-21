@@ -77,6 +77,15 @@
     "settingsTitle": "장치 설정 (#{{id}})",
     "settingsSaveSection": "저장",
     "settingsEditDevice": "장치 정보 수정",
+    "connect": "연결",
+    "disconnect": "연결 해제",
+    "connectConfirm": "이 장치를 연결하시겠습니까?",
+    "connectSuccess": "장치가 연결되었습니다.",
+    "disconnectConfirm": "이 장치를 연결 해제하시겠습니까?",
+    "disconnectSuccess": "장치가 연결 해제되었습니다.",
+    "checkSession": "세션 확인",
+    "checkSessionSuccess": "세션이 확인되었습니다.",
+    "checkSessionConfirm": "이 장치의 세션을 확인하시겠습니까?",
     "settings": {
       "nav": {
         "identification": "인증 모드",
