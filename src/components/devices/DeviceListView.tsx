@@ -246,12 +246,21 @@ export default function DeviceListView({
     }
   };
 
-  const handleActiveChange = (deviceId: number, isActive: boolean) => {
-    updateDeviceStatusMutation.mutate({
-      id: deviceId,
-      body: { isActive },
-    });
-  };
+  const handleActiveChange = useCallback(
+    (deviceId: number, isActive: boolean) => {
+      const ok = window.confirm(
+        isActive
+          ? t("devices.setActiveConfirm")
+          : t("devices.setInactiveConfirm"),
+      );
+      if (!ok) return;
+      updateDeviceStatusMutation.mutate({
+        id: deviceId,
+        body: { isActive },
+      });
+    },
+    [t, updateDeviceStatusMutation.mutate],
+  );
   //#endregion
 
   const columns = useMemo<GridColDef<DeviceGridRow>[]>(
@@ -408,6 +417,7 @@ export default function DeviceListView({
       rowMenu.openMenu,
       expandedDeviceIds,
       toggleDeviceExpanded,
+      handleActiveChange,
     ],
   );
 

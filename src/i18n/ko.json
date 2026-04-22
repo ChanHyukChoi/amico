@@ -73,6 +73,8 @@
     "notFound": "장치를 찾을 수 없습니다.",
     "backToList": "목록으로",
     "deleteConfirm": "이 장치를 삭제하시겠습니까?",
+    "setActiveConfirm": "이 장치를 활성화하시겠습니까?",
+    "setInactiveConfirm": "이 장치를 비활성화하시겠습니까?",
     "rowMenuSettings": "설정",
     "settingsTitle": "장치 설정 (#{{id}})",
     "settingsSaveSection": "저장",
