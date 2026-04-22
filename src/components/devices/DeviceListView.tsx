@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   IconButton,
+  Checkbox,
   Stack,
   TextField,
   type Theme,
@@ -18,7 +19,11 @@ import {
   type GridSortModel,
 } from "@mui/x-data-grid";
 
-import { deleteDevice, fetchDevices } from "@/api/devices/devices";
+import {
+  deleteDevice,
+  fetchDevices,
+  updateDeviceStatus,
+} from "@/api/devices/devices";
 import { DataGridRowActionsMenu } from "@/components/common/DataGridRowActionsMenu";
 import { ListPageHeader } from "@/components/common/ListPageHeader";
 import { useRowActionMenu } from "@/hooks/useRowActionMenu";
@@ -29,12 +34,6 @@ import {
   getDeviceTypeLabel,
 } from "@/constants/deviceModelOptions";
 import type { Device, DeviceDetailRow } from "@/types/device";
-import { DeviceControlMenu } from "@/components/devices/DeviceControlMenu";
-import {
-  loginDevice,
-  logoutDevice,
-  checkSession,
-} from "@/api/devices/vendor/hid/amico/auth";
 import axios from "axios";
 //#endregion
 
@@ -180,39 +179,16 @@ export default function DeviceListView({
     },
   });
 
-  const loginMutation = useMutation({
-    mutationFn: loginDevice,
+  const updateDeviceStatusMutation = useMutation({
+    mutationFn: ({
+      id,
+      body,
+    }: {
+      id: number;
+      body: Parameters<typeof updateDeviceStatus>[1];
+    }) => updateDeviceStatus(id, body),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["devices"] });
-      controlMenu.closeMenu();
-      alert(t("devices.connectSuccess"));
-    },
-    onError: (err) => {
-      alert(getMutationErrorMessage(err));
-    },
-  });
-
-  const logoutMutation = useMutation({
-    mutationFn: logoutDevice,
-    onSuccess: (message) => {
-      void queryClient.invalidateQueries({ queryKey: ["devices"] });
-      controlMenu.closeMenu();
-      alert(message);
-    },
-    onError: (err) => {
-      alert(getMutationErrorMessage(err));
-    },
-  });
-
-  const checkSessionMutation = useMutation({
-    mutationFn: checkSession,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["devices"] });
-      controlMenu.closeMenu();
-      alert(t("devices.checkSessionSuccess"));
-    },
-    onError: (err) => {
-      alert(getMutationErrorMessage(err));
     },
   });
   //#endregion
@@ -270,37 +246,11 @@ export default function DeviceListView({
     }
   };
 
-  const handleConnect = () => {
-    if (
-      controlMenu.selectedRow &&
-      window.confirm(t("devices.connectConfirm"))
-    ) {
-      loginMutation.mutate(controlMenu.selectedRow.id);
-    } else {
-      controlMenu.closeMenu();
-    }
-  };
-
-  const handleDisconnect = () => {
-    if (
-      controlMenu.selectedRow &&
-      window.confirm(t("devices.disconnectConfirm"))
-    ) {
-      logoutMutation.mutate(controlMenu.selectedRow.id);
-    } else {
-      controlMenu.closeMenu();
-    }
-  };
-
-  const handleCheckSession = () => {
-    if (
-      controlMenu.selectedRow &&
-      window.confirm(t("devices.checkSessionConfirm"))
-    ) {
-      checkSessionMutation.mutate(controlMenu.selectedRow.id);
-    } else {
-      controlMenu.closeMenu();
-    }
+  const handleActiveChange = (deviceId: number, isActive: boolean) => {
+    updateDeviceStatusMutation.mutate({
+      id: deviceId,
+      body: { isActive },
+    });
   };
   //#endregion
 
@@ -419,25 +369,14 @@ export default function DeviceListView({
         minWidth: 50,
         valueGetter: (value, row) =>
           isDeviceDetailRow(row) ? "" : (value ?? row.isActive),
-      },
-      {
-        field: "contorls",
-        headerName: "제어",
-        width: 56,
-        sortable: false,
-        filterable: false,
-        flex: 1,
         renderCell: (params: GridRenderCellParams<DeviceGridRow>) => {
-          const device = params.row;
-          if (isDeviceDetailRow(device)) return null;
+          const row = params.row;
+          if (isDeviceDetailRow(row)) return null;
           return (
-            <IconButton
-              size="small"
-              onClick={(e) => controlMenu.openMenu(e, device)}
-              aria-label={t("devices.controls")}
-            >
-              <MoreVert fontSize="small" />
-            </IconButton>
+            <Checkbox
+              checked={row.isActive ?? false}
+              onChange={(e) => handleActiveChange(row.id, e.target.checked)}
+            />
           );
         },
       },
@@ -578,14 +517,6 @@ export default function DeviceListView({
         onClose={rowMenu.closeMenu}
         onEdit={handleEdit}
         onDelete={handleDelete}
-      />
-      <DeviceControlMenu
-        anchorEl={controlMenu.anchorEl}
-        open={controlMenu.menuOpen}
-        onClose={controlMenu.closeMenu}
-        onConnect={handleConnect}
-        onDisconnect={handleDisconnect}
-        onCheckSession={handleCheckSession}
       />
     </Box>
   );

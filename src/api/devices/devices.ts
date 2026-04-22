@@ -6,6 +6,7 @@ import type {
   UpdateDeviceRequest,
   Device,
   DeviceListParams,
+  UpdateDeviceStatusRequest,
 } from "@/types/device";
 
 function buildDeviceListQuery(
@@ -62,6 +63,18 @@ export const updateDevice = async (id: number, body: UpdateDeviceRequest) => {
 export const deleteDevice = async (id: number) => {
   const { data } = await instance.delete<ApiResponse<Device>>(
     `/api/devices/${id}`,
+  );
+  assertApiSuccess(data);
+  return data.data;
+};
+
+export const updateDeviceStatus = async (
+  id: number,
+  body: UpdateDeviceStatusRequest,
+) => {
+  const { data } = await instance.patch<ApiResponse<boolean>>(
+    `/api/devices/${id}/status`,
+    body,
   );
   assertApiSuccess(data);
   return data.data;

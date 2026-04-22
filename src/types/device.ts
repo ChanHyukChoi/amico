@@ -58,4 +58,8 @@ export type DeviceDetailRow = {
   __isDetail: true;
   parent: Device;
 };
+
+export type UpdateDeviceStatusRequest = {
+  isActive: boolean;
+};
 //#endregion

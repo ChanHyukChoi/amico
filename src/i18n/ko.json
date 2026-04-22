@@ -156,7 +156,7 @@
       "settings": "설정",
       "settingsAccess": "출입 설정",
       "settingsNetwork": "네트워크",
-      "settingsSystem": "시스템"
+      "systemSettings": "시스템 설정"
     }
   }
 }

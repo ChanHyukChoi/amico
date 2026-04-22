@@ -9,6 +9,7 @@ const navItems: { to: string; key: string }[] = [
   { to: "/users", key: "layout.nav.users" },
   { to: "/devices", key: "layout.nav.devices" },
   { to: "/access-log", key: "layout.nav.accessLog" },
+  { to: "/system-settings", key: "layout.nav.systemSettings" },
 ];
 //#endregion
 

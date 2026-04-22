@@ -11,6 +11,7 @@ import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { UserPage } from "@/pages/UserPage";
 import { DevicePage } from "@/pages/DevicePage";
+import { SystemSettingPage } from "@/pages/SystemSettingPage";
 //#endregion
 
 //#region constants
@@ -53,6 +54,10 @@ function App() {
                 <Route index element={<DashboardPage />} />
                 <Route path="/users" element={<UserPage />} />
                 <Route path="/devices" element={<DevicePage />} />
+                <Route
+                  path="/system-settings"
+                  element={<SystemSettingPage />}
+                />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
